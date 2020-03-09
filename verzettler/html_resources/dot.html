@@ -1,0 +1,26 @@
+<html lang="html">
+<head>
+  <title>Zettelkasten</title>
+  <script src="{js_path}"></script>
+</head>
+<body>
+
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+  let container = document.getElementById('mynetwork');
+  let dot = '{dotgraph}';
+  let data = vis.parseDOTNetwork(dot);
+  let network = new vis.Network(container, data);
+
+  network.on( 'click', function(properties) {
+    let id = properties.nodes[0];
+    let clickedNode = network.body.nodes[id];
+    let url = clickedNode.options.labelURL;
+    window.open(url);
+  });
+</script>
+
+</body>
+</html>
+

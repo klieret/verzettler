@@ -46,7 +46,7 @@ class Zettelkasten(object):
     # MISC
     # =========================================================================
 
-    def dot_graph(self):
+    def dot_graph(self) -> str:
         lines = ["digraph zettelkasten {"]
         for zettel in self.zettels:
             lines.append(

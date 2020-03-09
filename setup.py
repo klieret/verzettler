@@ -47,7 +47,7 @@ setup(
         "Bug Tracker": "https://github.com/klieret/verzettler/issues",
         "Source Code": "https://github.com/klieret/verzettler/",
     },
-    package_data={"verzettler": ["version.txt"]},
+    include_package_data=True,
     keywords=keywords,
     description=description,
     long_description=long_description,
