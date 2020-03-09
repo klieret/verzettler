@@ -50,7 +50,11 @@ class Zettelkasten(object):
         lines = ["digraph zettelkasten {"]
         for zettel in self.zettels:
             lines.append(
-            f'{zettel.zid} [label="{zettel.title}" labelURL="file://{zettel.path}"];')
+                f'{zettel.zid} ['
+                f'label="{zettel.title}" '
+                f'labelURL="file://{zettel.path}"'
+                f'];'
+            )
             for link in zettel.links:
                 lines.append(f"{zettel.zid} -> {link};")
         lines.append("}")
