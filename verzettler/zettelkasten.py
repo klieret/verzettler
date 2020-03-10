@@ -6,6 +6,9 @@ from abc import ABC, abstractmethod
 from typing import List, Union, Optional, Iterable, Set
 from pathlib import Path, PurePath
 
+# 3rd
+from colour import Color
+
 # ours
 from verzettler.zettel import Zettel
 
@@ -65,6 +68,21 @@ class ConstantColorPicker(ColorPicker):
         return self.color
 
 
+class DepthColorPicker(ColorPicker):
+
+    def __init__(self, zettelkasten: "Zettelkasten", start_color="#f67280", end_color="#fff7f8"):
+        zettelkasten.update_depths()
+        self.colors = list(
+            Color(start_color).range_to(Color(end_color), zettelkasten.depth)
+        )
+
+    def pick(self, zettel: Zettel) -> str:
+        if zettel.depth:
+            return self.colors[zettel.depth-1]
+        else:
+            return self.colors[0]
+
+
 class Zettelkasten(object):
 
     def __init__(self, zettels: Optional[List[Zettel]] = None):
@@ -90,6 +108,14 @@ class Zettelkasten(object):
     @property
     def categories(self) -> Set[str]:
         return set(t for t in self.tags if t.startswith("c_"))
+
+    @property
+    def depth(self) -> int:
+        maxdepth = 0
+        for z in self.zettels:
+            if z.depth is not None:
+                maxdepth = max(z.depth, maxdepth)
+        return maxdepth
 
     # Extending collection
     # =========================================================================
@@ -123,13 +149,13 @@ class Zettelkasten(object):
         ]
 
         if color_picker is None:
-            color_picker = ConstantColorPicker()
+            color_picker = DepthColorPicker(self)
 
         drawn_links = []
         for zettel in self.zettels:
             lines.append(
                 f'\t{zettel.zid} ['
-                f'label="{zettel.title}" '
+                f'label="{zettel.title} ({zettel.depth})" '
                 f'labelURL="file://{zettel.path}" '
                 f'color={color_picker.pick(zettel)}'
                 f'];'
@@ -148,6 +174,19 @@ class Zettelkasten(object):
 
         lines.append("}")
         return "\n".join(lines)
+
+    def update_depths(self, mother="00000000000000", mother_depth=0):
+        mother = self.zid2zettel[mother]
+        if mother.depth is not None:
+            return
+        mother.depth = mother_depth
+        for daughter in mother.links:
+            self.update_depths(
+                mother=daughter,
+                mother_depth=mother_depth+1
+            )
+            self.zid2zettel[daughter].depth = mother_depth + 1
+
 
     # Magic
     # =========================================================================

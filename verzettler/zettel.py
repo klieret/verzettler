@@ -19,6 +19,8 @@ class Zettel(object):
         self.title = ""
         self.tags = set()  # type: Set[str]
 
+        self.depth = None  # type: Optional[int]
+
         self.analyze_file()
 
     # Class methods
