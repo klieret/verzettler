@@ -2,13 +2,14 @@
 
 # std
 import re
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Set
 from pathlib import Path, PurePath
 
 
 class Zettel(object):
 
     id_regex = re.compile("[0-9]{14}")
+    tag_regex = re.compile(r"#\S*")
 
     def __init__(self, path: Path):
         self.path = path
@@ -16,6 +17,7 @@ class Zettel(object):
 
         self.links = []  # type: List[str]
         self.title = ""
+        self.tags = set()  # type: Set[str]
 
         self.analyze_file()
 
@@ -41,6 +43,10 @@ class Zettel(object):
             for line in inf.readlines():
                 if line.startswith("# "):
                     self.title = line.split("# ")[1].strip()
+                if "tags: " in line.lower():
+                    self.tags = set(
+                        t[1:] for t in set(self.tag_regex.findall(line))
+                    )
                 self.links.extend(self.id_regex.findall(line))
 
     # Magic
