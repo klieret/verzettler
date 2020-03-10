@@ -2,11 +2,67 @@
 
 # std
 import os
+from abc import ABC, abstractmethod
 from typing import List, Union, Optional, Iterable, Set
 from pathlib import Path, PurePath
 
 # ours
 from verzettler.zettel import Zettel
+
+
+class ColorPicker(ABC):
+
+    @abstractmethod
+    def pick(self, zettel: Zettel):
+        pass
+
+
+class CategoryColorPicker(ColorPicker):
+
+    def __init__(
+            self,
+            zettelkasten: "Zettelkasten",
+            colors: Optional[List[str]] = None
+    ):
+
+        self.zettelkasten = zettelkasten
+        if colors is None:
+            colors = [
+                "#8dd3c7",
+                "#ffffb3",
+                "#bebada",
+                "#fb8072",
+                "#80b1d3",
+                "#fdb462",
+                "#b3de69",
+                "#fccde5",
+                "#d9d9d9",
+                "#bc80bd",
+                "#ccebc5",
+                "#ffed6f",
+            ]
+
+        self.category2color = {
+            c: colors[i % len(colors)]
+            for i, c in enumerate(self.zettelkasten.categories)
+        }
+
+    def pick(self, zettel: Zettel):
+        categories = [t for t in zettel.tags if t.startswith("c_")]
+        if len(categories) != 1:
+            # unfortunately vis.js doesn't support multiple colors
+            return "white"
+        else:
+            return ":".join([self.category2color[c] for c in categories])
+
+
+class ConstantColorPicker(ColorPicker):
+
+    def __init__(self, color= "#8dd3c7"):
+        self.color = color
+
+    def pick(self, zettel: Zettel):
+        return self.color
 
 
 class Zettelkasten(object):
@@ -60,36 +116,14 @@ class Zettelkasten(object):
     # MISC
     # =========================================================================
 
-    def dot_graph(self) -> str:
+    def dot_graph(self, color_picker: Optional[ColorPicker] = None) -> str:
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
         ]
-        colors = [
-            "#8dd3c7",
-            "#ffffb3",
-            "#bebada",
-            "#fb8072",
-            "#80b1d3",
-            "#fdb462",
-            "#b3de69",
-            "#fccde5",
-            "#d9d9d9",
-            "#bc80bd",
-            "#ccebc5",
-            "#ffed6f",
-        ]
-        category2color = {
-            c: colors[i % len(colors)] for i, c in enumerate(self.categories)
-        }
 
-        def pick_color(zettel: Zettel):
-            categories = [t for t in zettel.tags if t.startswith("c_")]
-            if len(categories) != 1:
-                # unfortunately vis.js doesn't support multiple colors
-                return "white"
-            else:
-                return ":".join([category2color[c] for c in categories])
+        if color_picker is None:
+            color_picker = ConstantColorPicker()
 
         drawn_links = []
         for zettel in self.zettels:
@@ -97,7 +131,7 @@ class Zettelkasten(object):
                 f'\t{zettel.zid} ['
                 f'label="{zettel.title}" '
                 f'labelURL="file://{zettel.path}" '
-                f'color={pick_color(zettel)}'
+                f'color={color_picker.pick(zettel)}'
                 f'];'
             )
             for link in zettel.links:
