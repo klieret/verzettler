@@ -47,16 +47,30 @@ class Zettelkasten(object):
     # =========================================================================
 
     def dot_graph(self) -> str:
-        lines = ["digraph zettelkasten {"]
+        lines = [
+            "digraph zettelkasten {",
+            "\tnode [shape=box];"
+        ]
+        drawn_links = []
         for zettel in self.zettels:
             lines.append(
-                f'{zettel.zid} ['
+                f'\t{zettel.zid} ['
                 f'label="{zettel.title}" '
                 f'labelURL="file://{zettel.path}"'
                 f'];'
             )
             for link in zettel.links:
-                lines.append(f"{zettel.zid} -> {link};")
+                if (zettel.zid, link) in drawn_links:
+                    continue
+                if zettel.zid not in self.zid2zettel[link].links:
+                    lines.append(f"\t{zettel.zid} -> {link};")
+                    drawn_links.append((zettel.zid, link))
+                else:
+                    lines.append(f"\t{zettel.zid} -> {link} [dir=both];")
+                    drawn_links.extend(
+                        [(zettel.zid, link), (link, zettel.zid)]
+                    )
+
         lines.append("}")
         return "\n".join(lines)
 

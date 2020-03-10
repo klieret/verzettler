@@ -8,7 +8,7 @@ import sys
 from verzettler.zettelkasten import Zettelkasten
 
 
-def format_dot_html(dot_str) -> str:
+def format_dot_html(dot_str: str) -> str:
     html_resource_dir = Path(__file__).parent.resolve() / "html_resources"
     js_path = html_resource_dir / "vis-network.min.js"
     html_path = html_resource_dir / "dot.html"

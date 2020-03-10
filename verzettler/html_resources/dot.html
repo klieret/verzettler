@@ -11,7 +11,20 @@
   let container = document.getElementById('mynetwork');
   let dot = '{dotgraph}';
   let data = vis.parseDOTNetwork(dot);
-  let network = new vis.Network(container, data);
+  let options = {
+      // layout: {
+      //     hierarchical: {
+      //         direction: "UD",
+              // sortMethod: "directed",
+          // },
+          // physics: {
+          //   hierarchicalRepulsion: {
+          //     avoidOverlap: "1",
+          //   }
+          // }
+      // }
+  };
+  let network = new vis.Network(container, data, options);
 
   network.on( 'click', function(properties) {
     let id = properties.nodes[0];
