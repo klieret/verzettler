@@ -16,6 +16,7 @@ class Zettel(object):
         self.zid = self.get_zid(path)  # type: str
 
         self.links = []  # type: List[str]
+        self.existing_backlinks = []  # type: List[str]
         self.title = ""
         self.tags = set()  # type: Set[str]
 
@@ -37,19 +38,27 @@ class Zettel(object):
             return path.name
 
     # Analyze file
+    # =========================================================================
 
     def analyze_file(self) -> None:
         """ Links from file """
         self.links = []
+        self.existing_backlinks = []
+        backlinks_section = False
         with self.path.open() as inf:
             for line in inf.readlines():
                 if line.startswith("# "):
                     self.title = line.split("# ")[1].strip()
-                if "tags: " in line.lower():
+                elif "tags: " in line.lower():
                     self.tags = set(
                         t[1:] for t in set(self.tag_regex.findall(line))
                     )
-                self.links.extend(self.id_regex.findall(line))
+                elif line.startswith("##") and "backlinks" in line.lower():
+                    backlinks_section = True
+                if backlinks_section:
+                    self.existing_backlinks.extend(self.id_regex.findall(line))
+                else:
+                    self.links.extend(self.id_regex.findall(line))
 
     # Magic
     # =========================================================================
