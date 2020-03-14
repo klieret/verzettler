@@ -6,6 +6,7 @@ from typing import Optional, Union, Set
 from pathlib import Path, PurePath
 import io
 import subprocess
+import json
 
 # 3rd
 import panflute
@@ -18,9 +19,10 @@ def list_container_to_string(lc):
 class Zettel(object):
 
     id_regex = re.compile("[0-9]{14}")
+    zid_link_regex = re.compile(r"\[\[[0-9]{14}\]\]")
     tag_regex = re.compile(r"#\S*")
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, zettelkasten=None):
         self.path = path
         self.zid = self.get_zid(path)  # type: str
 
@@ -30,6 +32,10 @@ class Zettel(object):
         self.tags = set()  # type: Set[str]
 
         self.depth = None  # type: Optional[int]
+
+        self.pf_doc = None  # type: Optional[panflute.Doc]
+
+        self.zettelkasten = zettelkasten
 
         self.analyze_file()
 
@@ -49,7 +55,7 @@ class Zettel(object):
     # Analyze file
     # =========================================================================
 
-    def panflute_filter(self, elem: panflute.Element, doc: panflute.Doc) \
+    def _pf_filter_sections(self, elem: panflute.Element, doc: panflute.Doc) \
             -> panflute.Element:
 
         if isinstance(elem, panflute.Header):
@@ -59,9 +65,17 @@ class Zettel(object):
             if elem.level == 1:
                 self.title = list_container_to_string(elem.content)
 
+        return elem
+
+    def pf_filter_analyze(self, elem: panflute.Element, doc: panflute.Doc) \
+            -> panflute.Element:
+
+        elem = self._pf_filter_sections(elem, doc)
+
         if isinstance(elem, panflute.Str):
             self.tags |= set(self.tag_regex.findall(elem.text))
 
+            # noinspection PyUnresolvedReferences
             if len(doc.verzettler_section) < 2 or \
                     "backlinks" != doc.verzettler_section[1].lower():
                 self.links |= set(self.id_regex.findall(elem.text))
@@ -70,9 +84,18 @@ class Zettel(object):
 
         return elem
 
-    def analyze_file(self) -> None:
-        """ Links from file """
+    def pf_filter_transform(self, elem: panflute.Element, doc: panflute.Doc) \
+        -> panflute.Element:
 
+        elem = self._pf_filter_sections(elem, doc)
+
+        if isinstance(elem, panflute.Str):
+            if self.zid_link_regex.match(elem.text):
+                print(elem.text)
+
+        return elem
+
+    def analyze_file(self) -> None:
         # json_str = pypandoc.convert_file(str(self.path), 'json', format='md')
         json_str = subprocess.run(
             [
@@ -84,15 +107,29 @@ class Zettel(object):
             capture_output=True
         ).stdout.decode("utf-8")
         inf = io.StringIO(json_str)
-        doc = panflute.load(inf)
+        self.pf_doc = panflute.load(inf)
 
-        doc.verzettler_section = []
+        self.pf_doc.verzettler_section = []
 
         self.links = set()
         self.existing_backlinks = set()
         self.tags = set()
         #
-        doc.walk(self.panflute_filter)
+        self.pf_doc = self.pf_doc.walk(self.pf_filter_analyze)
+
+    def transform_file(self) -> None:
+        self.pf_doc = self.pf_doc.walk(self.pf_filter_transform)
+
+    def write(self) -> None:
+        altered_json = json.dumps(self.pf_doc.to_json())
+        altered_md = subprocess.run(
+            ["pandoc", "-f", "json", "-t", "markdown", "--atx-header", "--wrap", "none"],
+            input=altered_json, encoding="utf8", capture_output=True
+        ).stdout
+        with self.path.open("w") as outf:
+            outf.write(altered_md)
+
+
 
     # Magic
     # =========================================================================

@@ -24,5 +24,6 @@ def format_dot_html(dot_str: str) -> str:
 if __name__ == "__main__":
     zk = Zettelkasten()
     zk.add_zettels_from_directory(sys.argv[1])
+    zk.transform()
     with open(sys.argv[2], "w") as outf:
         outf.write(format_dot_html(zk.dot_graph()))
