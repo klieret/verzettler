@@ -122,7 +122,9 @@ class Zettelkasten(object):
 
     def add_zettels(self, zettels: Iterable[Zettel]) -> None:
         for zettel in zettels:
+            zettel.zettelkasten = self
             self.zid2zettel[zettel.zid] = zettel
+
 
     def add_zettels_from_directory(
             self,
@@ -141,6 +143,10 @@ class Zettelkasten(object):
 
     # MISC
     # =========================================================================
+
+    def transform_all(self) -> None:
+        for zettel in self.zettels:
+            zettel.transform_file()
 
     def dot_graph(self, color_picker: Optional[ColorPicker] = None) -> str:
         lines = [
@@ -190,6 +196,9 @@ class Zettelkasten(object):
 
     # Magic
     # =========================================================================
+
+    def __getitem__(self, item):
+        return self.zid2zettel[item]
 
     def __repr__(self):
         return f"Zettelkasten({len(self.zid2zettel)})"

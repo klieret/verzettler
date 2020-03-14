@@ -4,14 +4,17 @@
 import re
 from typing import List, Optional, Union, Set
 from pathlib import Path, PurePath
+import os.path
 
 
 class Zettel(object):
 
     id_regex = re.compile("[0-9]{14}")
+    id_link_regex = re.compile(r"\[\[[0-9]{14}\]\]")
     tag_regex = re.compile(r"#\S*")
+    autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, zettelkasten=None):
         self.path = path
         self.zid = self.get_zid(path)  # type: str
 
@@ -21,6 +24,8 @@ class Zettel(object):
         self.tags = set()  # type: Set[str]
 
         self.depth = None  # type: Optional[int]
+
+        self.zettelkasten = zettelkasten
 
         self.analyze_file()
 
@@ -41,7 +46,6 @@ class Zettel(object):
     # =========================================================================
 
     def analyze_file(self) -> None:
-        """ Links from file """
         self.links = []
         self.existing_backlinks = []
         backlinks_section = False
@@ -59,6 +63,28 @@ class Zettel(object):
                     self.existing_backlinks.extend(self.id_regex.findall(line))
                 else:
                     self.links.extend(self.id_regex.findall(line))
+
+    def transform_file(self) -> None:
+        out_lines = []
+        with self.path.open() as inf:
+            for line in inf.readlines():
+                line = self.autogen_link_regex.sub("", line)
+                links = self.id_link_regex.findall(line)
+                for link in links:
+                    zid = self.id_regex.findall(link)
+                    assert len(zid) == 1
+                    zid = zid[0]
+                    rel_path = Path(
+                        os.path.relpath(
+                            str(self.zettelkasten[zid].path),
+                            str(self.path.parent))
+                    )
+                    link_title = self.zettelkasten[zid].title
+                    new_links = f"[[{zid}]] [{link_title}]({rel_path} \"autogen\")"
+                    line = line.replace(link, new_links)
+                out_lines.append(line)
+        with self.path.open("w") as outf:
+            outf.writelines(out_lines)
 
     # Magic
     # =========================================================================
