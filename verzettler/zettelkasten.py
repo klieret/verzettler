@@ -117,6 +117,16 @@ class Zettelkasten(object):
                 maxdepth = max(z.depth, maxdepth)
         return maxdepth
 
+    # Getting things
+    # =========================================================================
+
+    def get_by_path(self, path: Union[str, PurePath]) -> Zettel:
+        path = Path(path)
+        # fixme
+        res = [z for z in self.zettels if z.path.name == path.name]
+        assert len(res) == 1, (path.name, res)
+        return res[0]
+
     # Extending collection
     # =========================================================================
 
@@ -144,9 +154,9 @@ class Zettelkasten(object):
     # MISC
     # =========================================================================
 
-    def transform_all(self) -> None:
+    def transform_all(self, **kwargs) -> None:
         for zettel in self.zettels:
-            zettel.transform_file()
+            zettel.transform_file(**kwargs)
 
     def dot_graph(self, color_picker: Optional[ColorPicker] = None) -> str:
         lines = [

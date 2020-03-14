@@ -2,7 +2,7 @@
 
 # std
 from pathlib import Path
-import sys
+import argparse
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
@@ -21,9 +21,28 @@ def format_dot_html(dot_str: str) -> str:
     return html
 
 
-if __name__ == "__main__":
+def cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i",
+        "--input",
+        nargs="+",
+        help="Input directories of the zettelkastens."
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output html file"
+    )
+    args = parser.parse_args()
     zk = Zettelkasten()
-    zk.add_zettels_from_directory(sys.argv[1])
+    for inpt_dir in args.input:
+        zk.add_zettels_from_directory(inpt_dir)
+    # todo: should that really be here?
     zk.transform_all()
-    with open(sys.argv[2], "w") as outf:
+    with open(args.output, "w") as outf:
         outf.write(format_dot_html(zk.dot_graph()))
+
+
+if __name__ == "__main__":
+    cli()

@@ -4,5 +4,4 @@
 *.ipynb
 **/__pycache__/**
 *.pyc
-_*
 verzettler.egg-info/**

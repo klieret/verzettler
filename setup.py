@@ -57,4 +57,11 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Visualization",
     ],
+    entry_points={
+        "console_scripts": [
+            "zk_web = verzettler.bin.zk_web:cli",
+            "zk_modify_tags = verzettler.bin.zk_modify_tags:cli",
+            "zk_transform = verzettler.bin.zk_transform:cli",
+        ]
+    }
 )

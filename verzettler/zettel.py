@@ -87,18 +87,33 @@ class Zettel(object):
             lastline = None
             for line in inf.readlines():
 
+                # Change style of headers
+                if line.startswith("==="):
+                    out_lines = out_lines[:-1]
+                    out_lines.append("# " + lastline)
+                    continue
+                if line.startswith("---"):
+                    out_lines = out_lines[:-1]
+                    out_lines.append("## " + lastline)
+                    continue
+
                 # Modifying tags if haven't been given before
                 if not self.tags:
                     if lastline is not None and lastline.startswith("# "):
-                        out_lines.extend([
-                            "",
-                            self._format_tags(tag_transformer(set())),
-                            ""
-                        ])
+                        tags = tag_transformer(set())
+                        if tags:
+                            out_lines.extend([
+                                "\n",
+                                self._format_tags(tags),
+                                "\n"
+                            ])
 
                 # Modifying tags if already given
                 if "tags: " in line.lower():
                     tags = tag_transformer(self._read_tags(line))
+                    if not tags:
+                        # Remove line
+                        continue
                     line = self._format_tags(tags)
 
                 # Replacing/extending links
@@ -126,4 +141,4 @@ class Zettel(object):
     # =========================================================================
 
     def __repr__(self):
-        return f"Zettel({self.get_zid})"
+        return f"Zettel({self.zid})"
