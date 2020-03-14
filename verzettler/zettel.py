@@ -67,7 +67,9 @@ class Zettel(object):
         backlinks_section = False
         with self.path.open() as inf:
             for line in inf.readlines():
-                if line.startswith("# "):
+                if line.startswith("# ") and not self.title:
+                    # Careful, because '# something' can also appear in a
+                    # code block
                     self.title = line.split("# ")[1].strip()
                 elif "tags: " in line.lower():
                     self.tags = self._read_tags(line)
@@ -83,23 +85,32 @@ class Zettel(object):
 
     def transform_file(self, tag_transformer=identity) -> None:
         out_lines = []
+        is_code_block = False
         with self.path.open() as inf:
             lastline = None
             for line in inf.readlines():
+                if line.startswith("```"):
+                    is_code_block = not is_code_block
+
+                # Fixing
+                if is_code_block and "tags: " in line.lower():
+                    if not lastline.strip():
+                        out_lines = out_lines[:-1]
+                    continue
 
                 # Change style of headers
-                if line.startswith("==="):
+                if not is_code_block and line.startswith("==="):
                     out_lines = out_lines[:-1]
                     out_lines.append("# " + lastline)
                     continue
-                if line.startswith("---"):
+                if not is_code_block and line.startswith("---"):
                     out_lines = out_lines[:-1]
                     out_lines.append("## " + lastline)
                     continue
 
                 # Modifying tags if haven't been given before
                 if not self.tags:
-                    if lastline is not None and lastline.startswith("# "):
+                    if lastline is not None and lastline.startswith("# ") and not is_code_block:
                         tags = tag_transformer(set())
                         if tags:
                             out_lines.extend([
@@ -108,7 +119,7 @@ class Zettel(object):
                             ])
 
                 # Modifying tags if already given
-                if "tags: " in line.lower():
+                if "tags: " in line.lower() and not is_code_block:
                     tags = tag_transformer(self._read_tags(line))
                     if not tags:
                         # Remove line
