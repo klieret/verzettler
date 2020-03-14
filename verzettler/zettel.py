@@ -2,8 +2,17 @@
 
 # std
 import re
-from typing import List, Optional, Union, Set
+from typing import Optional, Union, Set
 from pathlib import Path, PurePath
+import io
+import subprocess
+
+# 3rd
+import panflute
+
+
+def list_container_to_string(lc):
+    return "".join(panflute.stringify(elem) for elem in lc)
 
 
 class Zettel(object):
@@ -15,8 +24,8 @@ class Zettel(object):
         self.path = path
         self.zid = self.get_zid(path)  # type: str
 
-        self.links = []  # type: List[str]
-        self.existing_backlinks = []  # type: List[str]
+        self.links = set()  # type: Set[str]
+        self.existing_backlinks = set()  # type: Set[str]
         self.title = ""
         self.tags = set()  # type: Set[str]
 
@@ -40,25 +49,50 @@ class Zettel(object):
     # Analyze file
     # =========================================================================
 
+    def panflute_filter(self, elem: panflute.Element, doc: panflute.Doc) \
+            -> panflute.Element:
+
+        if isinstance(elem, panflute.Header):
+            doc.verzettler_section = doc.verzettler_section[:elem.level - 1]
+            doc.verzettler_section.append(
+                list_container_to_string(elem.content))
+            if elem.level == 1:
+                self.title = list_container_to_string(elem.content)
+
+        if isinstance(elem, panflute.Str):
+            self.tags |= set(self.tag_regex.findall(elem.text))
+
+            if len(doc.verzettler_section) < 2 or \
+                    "backlinks" != doc.verzettler_section[1].lower():
+                self.links |= set(self.id_regex.findall(elem.text))
+            else:
+                self.existing_backlinks |= set(self.id_regex.findall(elem.text))
+
+        return elem
+
     def analyze_file(self) -> None:
         """ Links from file """
-        self.links = []
-        self.existing_backlinks = []
-        backlinks_section = False
-        with self.path.open() as inf:
-            for line in inf.readlines():
-                if line.startswith("# "):
-                    self.title = line.split("# ")[1].strip()
-                elif "tags: " in line.lower():
-                    self.tags = set(
-                        t[1:] for t in set(self.tag_regex.findall(line))
-                    )
-                elif line.startswith("##") and "backlinks" in line.lower():
-                    backlinks_section = True
-                if backlinks_section:
-                    self.existing_backlinks.extend(self.id_regex.findall(line))
-                else:
-                    self.links.extend(self.id_regex.findall(line))
+
+        # json_str = pypandoc.convert_file(str(self.path), 'json', format='md')
+        json_str = subprocess.run(
+            [
+                "pandoc",
+                "-t",
+                "json",
+                str(self.path),
+            ],
+            capture_output=True
+        ).stdout.decode("utf-8")
+        inf = io.StringIO(json_str)
+        doc = panflute.load(inf)
+
+        doc.verzettler_section = []
+
+        self.links = set()
+        self.existing_backlinks = set()
+        self.tags = set()
+        #
+        doc.walk(self.panflute_filter)
 
     # Magic
     # =========================================================================
