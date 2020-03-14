@@ -172,7 +172,7 @@ class Zettelkasten(object):
             lines.append(
                 f'\t{zettel.zid} ['
                 f'label="{zettel.title} ({zettel.depth})" '
-                f'labelURL="file://{zettel.path}" '
+                f'labelURL="file://{zettel.path.resolve()}" '
                 f'color={color_picker.pick(zettel)}'
                 f'];'
             )

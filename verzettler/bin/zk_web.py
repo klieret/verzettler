@@ -9,7 +9,7 @@ from verzettler.zettelkasten import Zettelkasten
 
 
 def format_dot_html(dot_str: str) -> str:
-    html_resource_dir = Path(__file__).parent.resolve() / "html_resources"
+    html_resource_dir = Path(__file__).parent.resolve().parent / "html_resources"
     js_path = html_resource_dir / "vis-network.min.js"
     html_path = html_resource_dir / "dot.html"
     dot_str = dot_str.replace("'", "\\'")
@@ -39,7 +39,8 @@ def cli():
     for inpt_dir in args.input:
         zk.add_zettels_from_directory(inpt_dir)
     # todo: should that really be here?
-    zk.transform_all()
+    # zk.transform_all()
+    print(zk)
     with open(args.output, "w") as outf:
         outf.write(format_dot_html(zk.dot_graph()))
 
