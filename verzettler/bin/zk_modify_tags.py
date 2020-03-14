@@ -42,7 +42,6 @@ def cli():
     zk = Zettelkasten()
     for inpt_dir in args.input:
         zk.add_zettels_from_directory(inpt_dir)
-    print(zk.zid2zettel)
 
     def tag_transformer(tags: Set[str]) -> Set[str]:
         tags = tags.copy()

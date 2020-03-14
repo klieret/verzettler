@@ -51,7 +51,7 @@ class Zettel(object):
 
     @staticmethod
     def _format_tags(tags: Iterable[str]) -> str:
-        return "Tags: " + " ".join("#"+tag for tag in tags)
+        return "Tags: " + " ".join("#"+tag for tag in tags) + "\n"
 
     def _read_tags(self, line: str) -> Set[str]:
         return set(
@@ -105,7 +105,6 @@ class Zettel(object):
                             out_lines.extend([
                                 "\n",
                                 self._format_tags(tags),
-                                "\n"
                             ])
 
                 # Modifying tags if already given
