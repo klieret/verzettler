@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import List, Union, Optional, Iterable, Set
 from pathlib import Path, PurePath
+import multiprocessing
 
 # 3rd
 from colour import Color
@@ -129,15 +130,13 @@ class Zettelkasten(object):
             directory: Union[PurePath, str]
     ) -> None:
         directory = Path(directory)
+        zettel_paths = []
         for root, dirs, files in os.walk(str(directory), topdown=True):
             dirs[:] = [d for d in dirs if d not in [".git"]]
-            self.add_zettels(
-                [
-                    Zettel(Path(root) / file)
-                    for file in files
-                    if file.endswith(".md")
-                ]
-            )
+            zettel_paths.extend([Path(root) / file for file in files if file.endswith(".md")])
+        pool = multiprocessing.Pool()
+        zettels = pool.map(Zettel, zettel_paths)
+        self.add_zettels(zettels)
 
     # MISC
     # =========================================================================
