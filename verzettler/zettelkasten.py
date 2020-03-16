@@ -125,11 +125,11 @@ class Zettelkasten(object):
     def _update_backlinks(self):
         # Reset
         for zettel in self.zettels:
-            zettel.backlinks = []
+            zettel.backlinks = set()
         # Add
         for zettel in self.zettels:
             for linked_zid in zettel.links:
-                self.zid2zettel[linked_zid].backlinks.append(zettel.zid)
+                self.zid2zettel[linked_zid].backlinks.add(zettel.zid)
 
     def _update_depths(self, mother="00000000000000", mother_depth=0):
         mother = self.zid2zettel[mother]
