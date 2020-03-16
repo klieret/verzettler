@@ -24,11 +24,14 @@ class Zettel(object):
         self.zid = self.get_zid(path)  # type: str
 
         self.links = []  # type: List[str]
-        self.existing_backlinks = []  # type: List[str]
+        self._existing_backlinks = []  # type: List[str]
         self.title = ""
         self.tags = set()  # type: Set[str]
 
+        # Gets set by ZK
         self.depth = None  # type: Optional[int]
+        # Gets set by ZK
+        self.backlinks = None  # type: Optional[List[str]]
 
         self.zettelkasten = zettelkasten
 
@@ -73,7 +76,7 @@ class Zettel(object):
 
     def analyze_file(self) -> None:
         self.links = []
-        self.existing_backlinks = []
+        self._existing_backlinks = []
         backlinks_section = False
         with self.path.open() as inf:
             for line in inf.readlines():
@@ -86,7 +89,7 @@ class Zettel(object):
                 elif line.startswith("##") and "backlinks" in line.lower():
                     backlinks_section = True
                 if backlinks_section:
-                    self.existing_backlinks.extend(self.id_regex.findall(line))
+                    self._existing_backlinks.extend(self.id_regex.findall(line))
                 else:
                     self.links.extend(self.id_regex.findall(line))
 
@@ -127,7 +130,8 @@ class Zettel(object):
 
                 # Modifying tags if haven't been given before
                 if not self.tags:
-                    if lastline is not None and lastline.startswith("# ") and not is_code_block:
+                    if lastline is not None and lastline.startswith("# ") \
+                            and not is_code_block:
                         tags = tag_transformer(set())
                         if tags:
                             out_lines.extend([
@@ -157,6 +161,7 @@ class Zettel(object):
                     new_links = self._format_link(zid)
                     line = line.replace(link, new_links)
 
+                # Add lines
                 out_lines.append(line)
                 lastline = line
         with self.path.open("w") as outf:

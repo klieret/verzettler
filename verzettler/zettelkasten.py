@@ -71,7 +71,7 @@ class ConstantColorPicker(ColorPicker):
 class DepthColorPicker(ColorPicker):
 
     def __init__(self, zettelkasten: "Zettelkasten", start_color="#f67280", end_color="#fff7f8"):
-        zettelkasten.update_depths()
+        zettelkasten._update_depths()
         self.colors = list(
             Color(start_color).range_to(Color(end_color), zettelkasten.depth)
         )
@@ -90,6 +90,8 @@ class Zettelkasten(object):
 
         if zettels is not None:
             self.add_zettels(zettels)
+
+        self._finalized = False
 
     # Properties
     # =========================================================================
@@ -117,6 +119,30 @@ class Zettelkasten(object):
                 maxdepth = max(z.depth, maxdepth)
         return maxdepth
 
+    # Help functions
+    # =========================================================================
+
+    def _update_backlinks(self):
+        # Reset
+        for zettel in self.zettels:
+            zettel.backlinks = []
+        # Add
+        for zettel in self.zettels:
+            for linked_zid in zettel.links:
+                self.zid2zettel[linked_zid].backlinks.append(zettel.zid)
+
+    def _update_depths(self, mother="00000000000000", mother_depth=0):
+        mother = self.zid2zettel[mother]
+        if mother.depth is not None:
+            return
+        mother.depth = mother_depth
+        for daughter in mother.links:
+            self._update_depths(
+                mother=daughter,
+                mother_depth=mother_depth+1
+            )
+            self.zid2zettel[daughter].depth = mother_depth + 1
+
     # Getting things
     # =========================================================================
 
@@ -131,15 +157,16 @@ class Zettelkasten(object):
     # =========================================================================
 
     def add_zettels(self, zettels: Iterable[Zettel]) -> None:
+        self._finalized = False
         for zettel in zettels:
             zettel.zettelkasten = self
             self.zid2zettel[zettel.zid] = zettel
-
 
     def add_zettels_from_directory(
             self,
             directory: Union[PurePath, str]
     ) -> None:
+        self._finalized = False
         directory = Path(directory)
         for root, dirs, files in os.walk(str(directory), topdown=True):
             dirs[:] = [d for d in dirs if d not in [".git"]]
@@ -151,14 +178,23 @@ class Zettelkasten(object):
                 ]
             )
 
+    def finalize(self):
+        self._update_backlinks()
+        self._update_depths()
+        self._finalized = True
+
     # MISC
     # =========================================================================
 
     def transform_all(self, **kwargs) -> None:
+        if not self._finalized:
+            self.finalize()
         for zettel in self.zettels:
             zettel.transform_file(**kwargs)
 
     def dot_graph(self, color_picker: Optional[ColorPicker] = None) -> str:
+        if not self._finalized:
+            self.finalize()
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
@@ -190,19 +226,6 @@ class Zettelkasten(object):
 
         lines.append("}")
         return "\n".join(lines)
-
-    def update_depths(self, mother="00000000000000", mother_depth=0):
-        mother = self.zid2zettel[mother]
-        if mother.depth is not None:
-            return
-        mother.depth = mother_depth
-        for daughter in mother.links:
-            self.update_depths(
-                mother=daughter,
-                mother_depth=mother_depth+1
-            )
-            self.zid2zettel[daughter].depth = mother_depth + 1
-
 
     # Magic
     # =========================================================================
