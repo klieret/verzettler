@@ -105,7 +105,6 @@ class Zettel(object):
         is_code_block = False
         current_section = []
         lastline = None
-        is_last_line = len(lines) == 0
 
         for i, line in enumerate(lines):
             remove_line = False
@@ -187,7 +186,7 @@ class Zettel(object):
                     out_lines.extend(["\n"])
                 elif len(out_lines) >= 1 and not out_lines[-1].endswith("\n"):
                     out_lines.extend(["\n", "\n"])
-                out_lines.append("## Backlinks\n")
+                out_lines.extend(["## Backlinks\n", "\n"])
                 for backlink in sorted(list(self.backlinks)):
                     out_lines.append(f"* {self._format_link(backlink)}\n")
 
