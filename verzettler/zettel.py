@@ -9,6 +9,7 @@ import os.path
 # ours
 from verzettler.markdown_reader import MarkdownReader
 
+
 def identity(arg):
     return arg
 
