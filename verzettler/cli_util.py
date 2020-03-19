@@ -76,7 +76,7 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
         return results[0]
 
     max_n = max(5, get_n_terminal_rows() - 5)
-    for i, r in enumerate(results):
+    for i, r in enumerate(sorted(results, key=lambda p: p.name)):
         print(f"{i: 3}", r.name)
         if i > max_n:
             print("... Rest omitted")
