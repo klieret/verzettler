@@ -6,6 +6,8 @@ from typing import List, Optional, Union, Set, Iterable, Set
 from pathlib import Path, PurePath
 import os.path
 
+# ours
+from verzettler.markdown_reader import MarkdownReader
 
 def identity(arg):
     return arg
@@ -35,7 +37,7 @@ class Zettel(object):
 
         self.zettelkasten = zettelkasten
 
-        self.analyze_file()
+        self._analyze_file()
 
     # Class methods
     # =========================================================================
@@ -74,24 +76,26 @@ class Zettel(object):
     # Analyze file
     # =========================================================================
 
-    def analyze_file(self) -> None:
-        self.links = []
-        self._existing_backlinks = []
-        backlinks_section = False
-        with self.path.open() as inf:
-            for line in inf.readlines():
-                if line.startswith("# ") and not self.title:
-                    # Careful, because '# something' can also appear in a
-                    # code block
-                    self.title = line.split("# ")[1].strip()
-                elif "tags: " in line.lower():
-                    self.tags = self._read_tags(line)
-                elif line.startswith("##") and "backlinks" in line.lower():
-                    backlinks_section = True
-                if backlinks_section:
-                    self._existing_backlinks.extend(self.id_regex.findall(line))
-                else:
-                    self.links.extend(self.id_regex.findall(line))
+    def _analyze_file(self) -> None:
+        """ Should be called only once! """
+
+        md_reader = MarkdownReader.from_file(self.path)
+        for md_line in md_reader.lines:
+            if len(md_line.current_section) == 1:
+                if self.title and self.title != md_line.current_section[0]:
+                    # todo: form
+                    print(f"{self.path} Warning: Multiple titles. ")
+                self.title = md_line.current_section[0]
+            if not md_line.is_code_block and md_line.text.lower().strip().startswith("tags: "):
+                if self.tags:
+                    # todo: form
+                    print(f"{self.path} Warning: Tags were already set.")
+                self.tags = self._read_tags(md_line.text)
+            if len(md_line.current_section) >= 2 and \
+                    md_line.current_section[1].lower().strip() == "backlinks":
+                self._existing_backlinks.extend(self.id_regex.findall(md_line.text))
+            else:
+                self.links.extend(self.id_regex.findall(md_line.text))
 
     # Modify file
     # =========================================================================
@@ -99,46 +103,28 @@ class Zettel(object):
     def transform_file(self, tag_transformer=identity) -> None:
         out_lines = []
 
-        with self.path.open() as inf:
-            lines = list(inf.readlines())
-
-        is_code_block = False
-        current_section = []
-        lastline = None
-
-        for i, line in enumerate(lines):
+        md_reader = MarkdownReader.from_file(self.path)
+        for i, md_line in enumerate(md_reader.lines):
             remove_line = False
-            is_last_line = i == len(lines) - 1
-
-            if line.startswith("```"):
-                is_code_block = not is_code_block
 
             # Fixing
-            if is_code_block and "tags: " in line.lower():
-                if not lastline.strip():
+            if md_line.is_code_block and "tags: " in md_line.text.lower():
+                if i >= 1 and not md_reader.lines[i-1].text.strip():
                     out_lines = out_lines[:-1]
                 continue
 
             # Change style of headers
-            if not is_code_block and line.startswith("==="):
+            if not md_line.is_code_block and md_line.text.startswith("==="):
                 out_lines = out_lines[:-1]
-                line = "# " + lastline
-            if not is_code_block and line.startswith("---"):
+                md_line.text = "# " + md_reader.lines[i-1].text
+            if not md_line.is_code_block and md_line.text.startswith("---"):
                 out_lines = out_lines[:-1]
-                line = "## " + lastline
-
-            # Set current section
-            sm = self.section_regex.match(line)
-            if not is_code_block and sm:
-                level = len(sm.group(1))-1
-                text = sm.group(2).strip()
-                current_section = current_section[:level]
-                current_section.append(text)
+                md_line.text = "## " + md_reader.lines[i-1].text
 
             # Modifying tags if haven't been given before
             if not self.tags:
-                if lastline is not None and lastline.startswith("# ") \
-                        and not is_code_block:
+                if i >= 1 and md_reader.lines[i-1].text.startswith("# ") \
+                        and not md_line.is_code_block:
                     tags = tag_transformer(set())
                     if tags:
                         out_lines.extend([
@@ -147,39 +133,38 @@ class Zettel(object):
                         ])
 
             # Modifying tags if already given
-            if "tags: " in line.lower() and not is_code_block:
-                tags = tag_transformer(self._read_tags(line))
+            if "tags: " in md_line.text.lower() and not md_line.is_code_block:
+                tags = tag_transformer(self._read_tags(md_line.text))
                 if not tags:
                     # Remove line
                     continue
-                line = self._format_tags(tags)
+                md_line.text = self._format_tags(tags)
 
             # Replacing/extending links
 
             # Remove old autogenerated links
-            line = self.autogen_link_regex.sub("", line)
+            md_line.text = self.autogen_link_regex.sub("", md_line.text)
 
             # Add new links
-            links = self.id_link_regex.findall(line)
+            links = self.id_link_regex.findall(md_line.text)
             for link in links:
                 zid = self.id_regex.findall(link)
                 assert len(zid) == 1
                 zid = zid[0]
                 new_links = self._format_link(zid)
-                line = line.replace(link, new_links)
+                md_line.text = md_line.text.replace(link, new_links)
 
             # Remove old backlinks section
-            if len(current_section) == 2 and \
-                    current_section[-1].lower() == "backlinks":
+            if len(md_line.current_section) == 2 and \
+                    md_line.current_section[-1].lower() == "backlinks":
                 remove_line = True
 
             # Add lines
             if not remove_line:
-                out_lines.append(line)
-                lastline = line
+                out_lines.append(md_line.text)
 
             # Add new blacklinks section to file
-            if is_last_line and self.backlinks:
+            if md_line.is_last_line and self.backlinks:
                 if len(out_lines) >= 1 and out_lines[-1] == "\n":
                     pass
                 elif len(out_lines) >= 1 and out_lines[-1].endswith("\n"):
