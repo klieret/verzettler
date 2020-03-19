@@ -3,8 +3,10 @@
 # std
 import argparse
 import sys
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List, Optional
 import os
+import readline
+from pathlib import PurePath
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
@@ -48,8 +50,44 @@ def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
     return zk, args
 
 
-def get_n_terminal_rows():
+def get_n_terminal_rows() -> int:
     try:
         return os.get_terminal_size(0)[1]
     except OSError:
         return os.get_terminal_size(1)[1]
+
+
+def set_path_autocompleter(results: List[PurePath]) -> None:
+    def completer(text, state):
+        options = [r.name for r in results if text in r.name]
+        if state < len(options):
+            return options[state]
+        else:
+            return None
+
+    readline.set_completer(completer)
+    readline.parse_and_bind("tab: complete")
+
+
+def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
+    if not results:
+        return None
+    elif len(results) == 1:
+        return results[0]
+
+    max_n = max(5, get_n_terminal_rows() - 5)
+    for i, r in enumerate(results):
+        print(f"{i: 3}", r.name)
+        if i > max_n:
+            print("... Rest omitted")
+            break
+    set_path_autocompleter(results)
+    selection = input("Your selection: ")
+    if selection.isnumeric():
+        return results[int(selection)]
+    else:
+        res = [r for r in results if selection in r.name]
+        if not len(res) == 1:
+            print("Your selection was not unique. Go again!")
+            return get_path_selection(results)
+        return res[0]

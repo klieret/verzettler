@@ -10,7 +10,8 @@ from typing import List
 # 3rd
 
 # ours
-from verzettler.cli_util import get_zk_dirs_from_cli, get_n_terminal_rows
+from verzettler.cli_util import \
+    get_zk_dirs_from_cli, get_n_terminal_rows, get_path_selection
 
 
 def get_search_results(
@@ -34,42 +35,6 @@ def get_search_results(
     return [Path(path_str) for path_str in opt.split("\n")]
 
 
-def set_autocompleter(results):
-    def completer(text, state):
-        options = [r.name for r in results if text in r.name]
-        if state < len(options):
-            return options[state]
-        else:
-            return None
-
-    readline.set_completer(completer)
-    readline.parse_and_bind("tab: complete")
-
-
-def get_selection(results):
-    if not results:
-        return None
-    elif len(results) == 1:
-        return results[0]
-
-    max_n = max(5, get_n_terminal_rows() - 5)
-    for i, r in enumerate(results):
-        print(f"{i: 3}", r.name)
-        if i > max_n:
-            print("... Rest omitted")
-            break
-    set_autocompleter(results)
-    selection = input("Your selection: ")
-    if selection.isnumeric():
-        return results[int(selection)]
-    else:
-        res = [r for r in results if selection in r.name]
-        if not len(res) == 1:
-            print("Your selection was not unique. Go again!")
-            return get_selection(results)
-        return res[0]
-
-
 def cli():
     def add_additional_argparse_arguments(parser: argparse.ArgumentParser):
         parser.add_argument(
@@ -86,7 +51,7 @@ def cli():
         search_term=args.search
     )
 
-    selection = get_selection(results)
+    selection = get_path_selection(results)
     if selection:
         print(selection)
 
