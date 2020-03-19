@@ -27,5 +27,5 @@ def get_zk_base_dirs_from_env() -> List[Path]:
         return existing_paths
 
 
-def pass_fct():
+def pass_fct(*args, **kwargs):
     pass
