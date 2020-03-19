@@ -11,8 +11,8 @@ from verzettler.util import get_zk_base_dirs_from_env, pass_fct
 from verzettler.log import logger
 
 
-def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
-        -> Tuple[Zettelkasten, argparse.Namespace]:
+def get_zk_dirs_from_cli(additional_argparse_setup: Callable = pass_fct) \
+        -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -31,6 +31,14 @@ def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
             "line, nor set in the ZK_HOME environment variable. Exit. "
         )
         sys.exit(111)
+    return args
+
+
+def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
+        -> Tuple[Zettelkasten, argparse.Namespace]:
+    args = get_zk_dirs_from_cli(
+        additional_argparse_setup=additional_argparse_setup
+    )
 
     zk = Zettelkasten()
     for inpt_dir in args.input:
