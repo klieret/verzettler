@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 # std
-import os
 from typing import List
 from pathlib import Path
 import shlex
+import os
 
 # ours
 from verzettler.log import logger

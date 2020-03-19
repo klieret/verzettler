@@ -4,6 +4,7 @@
 import argparse
 import sys
 from typing import Callable, Tuple
+import os
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
@@ -45,3 +46,10 @@ def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
         zk.add_zettels_from_directory(inpt_dir)
 
     return zk, args
+
+
+def get_n_terminal_rows():
+    try:
+        return os.get_terminal_size(0)[1]
+    except OSError:
+        return os.get_terminal_size(1)[1]

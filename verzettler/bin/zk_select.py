@@ -10,7 +10,7 @@ from typing import List
 # 3rd
 
 # ours
-from verzettler.cli_util import get_zk_dirs_from_cli
+from verzettler.cli_util import get_zk_dirs_from_cli, get_n_terminal_rows
 
 
 def get_search_results(
@@ -52,16 +52,20 @@ def get_selection(results):
     elif len(results) == 1:
         return results[0]
 
+    max_n = max(5, get_n_terminal_rows() - 5)
     for i, r in enumerate(results):
         print(f"{i: 3}", r.name)
+        if i > max_n:
+            print("... Rest omitted")
+            break
     set_autocompleter(results)
     selection = input("Your selection: ")
     if selection.isnumeric():
         return results[int(selection)]
     else:
-        res = [r for r in results if r.name == selection]
+        res = [r for r in results if selection in r.name]
         if not len(res) == 1:
-            print("Your selection was not unique. Go again")
+            print("Your selection was not unique. Go again!")
             return get_selection(results)
         return res[0]
 
