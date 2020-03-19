@@ -8,6 +8,9 @@ import os
 import readline
 from pathlib import PurePath
 
+# 3rd
+from termcolor import colored
+
 # ours
 from verzettler.zettelkasten import Zettelkasten
 from verzettler.util import get_zk_base_dirs_from_env, pass_fct
@@ -77,17 +80,17 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
 
     max_n = max(5, get_n_terminal_rows() - 5)
     for i, r in enumerate(sorted(results, key=lambda p: p.name)):
-        print(f"{i: 3}", r.name)
+        print(colored(f"{i: 3}", "yellow"), r.name)
         if i > max_n:
-            print("... Rest omitted")
+            print(colored("... Rest omitted", "red"))
             break
     set_path_autocompleter(results)
-    selection = input("Your selection: ")
+    selection = input(colored("Your selection: ", attrs=["bold"]))
     if selection.isnumeric():
         return results[int(selection)]
     else:
         res = [r for r in results if selection in r.name]
         if not len(res) == 1:
-            print("Your selection was not unique. Go again!")
+            print(colored("Your selection was not unique. Go again!", "red", attrs=["bold"]))
             return get_path_selection(results)
         return res[0]
