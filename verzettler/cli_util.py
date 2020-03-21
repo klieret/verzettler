@@ -97,13 +97,14 @@ def set_path_autocompleter(results: List[PurePath]) -> None:
 
 
 def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
+    results.sort(key=lambda p: p.name)
     if not results:
         return None
     elif len(results) == 1:
         return results[0]
 
     max_n = max(5, get_n_terminal_rows() - 5)
-    for i, r in enumerate(sorted(results, key=lambda p: p.name)):
+    for i, r in enumerate(results):
         print(colored(f"{i: 3}", "yellow"), r.name)
         if i > max_n:
             print(colored("... Rest omitted", "red"))
