@@ -7,7 +7,8 @@ import logging
 import colorlog
 
 
-def get_logger(name="Logger", level=logging.WARNING, sh_level=logging.DEBUG):
+def get_logger(name="Logger", level=logging.DEBUG, sh_level=logging.DEBUG) -> \
+        logging.Logger:
     """Sets up a logging.Logger.
 
     If the colorlog module is available, the logger will use colors,

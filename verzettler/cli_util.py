@@ -7,6 +7,7 @@ from typing import Callable, Tuple, List, Optional
 import os
 import readline
 from pathlib import PurePath
+import logging
 
 # 3rd
 from termcolor import colored
@@ -17,9 +18,18 @@ from verzettler.util import get_zk_base_dirs_from_env, pass_fct
 from verzettler.log import logger
 
 
-def get_zk_dirs_from_cli(additional_argparse_setup: Callable = pass_fct) \
-        -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
+def add_debug_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "-l",
+        "--log",
+        help="Level of the log: 'd' (debug), 'i' (info), 'w' (warning), "
+             "'e' (error), 'c' (critical).",
+        default="i",
+        choices=list("diwec"),
+    )
+
+
+def add_zk_dirs_arg(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-i",
         "--input",
@@ -27,24 +37,38 @@ def get_zk_dirs_from_cli(additional_argparse_setup: Callable = pass_fct) \
         help="Input directories of the zettelkastens. If left blank, will try"
              " to set from ZK_HOME environment variable. "
     )
-    additional_argparse_setup(parser)
-    args = parser.parse_args()
-    if not args.input:
-        args.input = get_zk_base_dirs_from_env()
-    if not args.input:
-        logger.critical(
-            "Zettelkasten input directories were neither specified by command "
-            "line, nor set in the ZK_HOME environment variable. Exit. "
-        )
-        sys.exit(111)
-    return args
+
+
+def default_arg_handling(args: argparse.Namespace) -> None:
+    if hasattr(args, "input"):
+        if not args.input:
+            args.input = get_zk_base_dirs_from_env()
+        if not args.input:
+            logger.critical(
+                "Zettelkasten input directories were neither specified by "
+                "command line, nor set in the ZK_HOME environment variable. "
+                "Exit. "
+            )
+            sys.exit(111)
+    if hasattr(args, "log"):
+        abbrev2loglevel = {
+            "d": logging.DEBUG,
+            "i": logging.INFO,
+            "w": logging.WARNING,
+            "e": logging.ERROR,
+            "c": logging.CRITICAL,
+        }
+        logger.setLevel(abbrev2loglevel[args.log])
 
 
 def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
         -> Tuple[Zettelkasten, argparse.Namespace]:
-    args = get_zk_dirs_from_cli(
-        additional_argparse_setup=additional_argparse_setup
-    )
+    parser = argparse.ArgumentParser()
+    add_zk_dirs_arg(parser)
+    add_debug_args(parser)
+    additional_argparse_setup(parser)
+    args = parser.parse_args()
+    default_arg_handling(args)
 
     zk = Zettelkasten()
     for inpt_dir in args.input:
