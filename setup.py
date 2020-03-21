@@ -62,7 +62,7 @@ setup(
             "zk_web = verzettler.bin.zk_web:cli",
             "zk_modify_tags = verzettler.bin.zk_modify_tags:cli",
             "zk_transform = verzettler.bin.zk_transform:cli",
-            "zk_select = verzettler.bin.zk_select:cli"
+            "zk_open = verzettler.bin.zk_open:cli"
         ]
     }
 )
