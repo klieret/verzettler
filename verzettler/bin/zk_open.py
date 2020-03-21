@@ -4,14 +4,12 @@
 import argparse
 import subprocess
 from pathlib import Path
-import readline
 from typing import List
 
 # 3rd
 
 # ours
-from verzettler.cli_util import \
-    get_zk_dirs_from_cli, get_n_terminal_rows, get_path_selection
+from verzettler.cli_util import get_zk_dirs_from_cli, get_path_selection
 
 
 def get_search_results(
@@ -41,6 +39,19 @@ def cli():
             dest="search",
             help="Search term",
         )
+        parser.add_argument(
+            "-a",
+            "--action",
+            help="Action to be executed with the search result. {file} will be "
+                 "replaced with the search result. E.g. 'vim {file}' to open "
+                 "the file in vim (make sure to use the single quotes to not "
+                 "have your shell meddling). For convenience: "
+                 "If '{file}' is not found in this "
+                 "string, then '{file}' is appended, i.e. 'vim' is equivalent "
+                 "to 'vim {file}'.",
+            default="",
+            type=str,
+        )
 
     args = get_zk_dirs_from_cli(
         additional_argparse_setup=add_additional_argparse_arguments
@@ -52,8 +63,19 @@ def cli():
     )
 
     selection = get_path_selection(results)
-    if selection:
+    if not selection:
+        return
+
+    if not args.action:
         print(selection)
+
+    if '{file}' not in args.action:
+        args.action = args.action + " {file}"
+
+    subprocess.run(
+        args.action.format(file=selection),
+        shell=True,
+    )
 
 
 if __name__ == "__main__":
