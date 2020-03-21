@@ -10,6 +10,7 @@ from typing import List
 
 # ours
 from verzettler.cli_util import get_zk_dirs_from_cli, get_path_selection
+from verzettler.log import logger
 
 
 def get_search_results(
@@ -65,17 +66,16 @@ def cli():
     selection = get_path_selection(results)
     if not selection:
         return
-
-    if not args.action:
+    elif not args.action:
         print(selection)
+    else:
+        if '{file}' not in args.action:
+            args.action = args.action + " {file}"
 
-    if '{file}' not in args.action:
-        args.action = args.action + " {file}"
+        command = args.action.format(file=selection)
+        logger.debug(f"Running in system: '{command}'")
 
-    subprocess.run(
-        args.action.format(file=selection),
-        shell=True,
-    )
+        subprocess.run(command, shell=True)
 
 
 if __name__ == "__main__":
