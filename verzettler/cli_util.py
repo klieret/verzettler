@@ -91,6 +91,12 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
     else:
         res = [r for r in results if selection in r.name]
         if not len(res) == 1:
-            print(colored("Your selection was not unique. Go again!", "red", attrs=["bold"]))
+            print(
+                colored(
+                    "Your selection was not unique. Go again!",
+                    "red",
+                    attrs=["bold"]
+                )
+            )
             return get_path_selection(results)
         return res[0]
