@@ -20,8 +20,17 @@ def get_search_results(
     sb_params = ["find", ]
     for d in search_dirs:
         sb_params.append(str(d))
+    if not "*" in search_term:
+        if not search_term.endswith(".md"):
+            search_term = f"*{search_term}*.md"
+        else:
+            search_term = f"*{search_term}.md"
+    else:
+        if search_term.endswith("*"):
+            search_term += ".md"
+    logger.debug(f"Search term: '{search_term}'.")
     sb_params.extend(["-type", "f", "-not", "-wholename", "*/.git*", "-name",
-                      f"*{search_term}*"])
+                      search_term])
 
     opt = subprocess.check_output(
         sb_params,
