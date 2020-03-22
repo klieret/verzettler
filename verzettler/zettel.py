@@ -5,6 +5,7 @@ import re
 from typing import List, Optional, Union, Set, Iterable, Set
 from pathlib import Path, PurePath
 import os.path
+import subprocess
 
 # ours
 from verzettler.markdown_reader import MarkdownReader
@@ -20,6 +21,7 @@ class Zettel(object):
     id_link_regex = re.compile(r"\[\[[0-9]{14}\]\]")
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
+    markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
     section_regex = re.compile(r"(#+)\s+(.+)")
 
     def __init__(self, path: Path, zettelkasten=None):
@@ -177,6 +179,46 @@ class Zettel(object):
                     out_lines.append(f"* {self._format_link(backlink)}\n")
 
         with self.path.open("w") as outf:
+            outf.writelines(out_lines)
+
+    # Export
+    # =========================================================================
+
+    # def to_html(self):
+    #     try:
+    #         subprocess.run(
+    #             ["pandoc", "-t", "html", "-s", "-c", ""]
+    #         )
+
+    def to_jekyll(self, path: Path):
+        out_lines = [
+            "---\n",
+            "layout: page\n",
+            f"title: \"{self.title}\"\n",
+            "exclude: true\n",  # do not add to menu
+            "---\n",
+        ]
+        md_reader = MarkdownReader.from_file(self.path)
+        for i, md_line in enumerate(md_reader.lines):
+            remove_line = False
+            if not md_line.is_code_block:
+                if md_line.text.startswith("# "):
+                    # Already set the title with meta info
+                    remove_line = True
+
+            # Replace raw zids, leave only links
+            md_line.text = self.id_link_regex.sub("", md_line.text)
+
+            # Replace links to md with links to html
+            md_line.text = self.markdown_link_regex.sub(
+                r"[\1](\2.html)",
+                md_line.text
+            )
+
+            if not remove_line:
+                out_lines.append(md_line.text)
+
+        with path.open("w") as outf:
             outf.writelines(out_lines)
 
     # Magic

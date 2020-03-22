@@ -227,6 +227,14 @@ class Zettelkasten(object):
         lines.append("}")
         return "\n".join(lines)
 
+    def stats_string(self) -> str:
+        lines = [
+            f"Total number of notes: {len(self.zid2zettel)}",
+            f"Total number of tags: {len(self.tags)}",
+        ]
+        return "\n".join(lines)
+
+
     # Magic
     # =========================================================================
 

@@ -33,23 +33,18 @@ def get_logger(name="Logger", level=logging.DEBUG, sh_level=logging.DEBUG) -> \
         return _logger
 
     _logger.setLevel(level)
-    if colorlog is not None:
-        sh = colorlog.StreamHandler()
-        log_colors = {
-            "DEBUG": "cyan",
-            "INFO": "green",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "red",
-        }
-        formatter = colorlog.ColoredFormatter(
-            "%(log_color)s%(name)s:%(levelname)s:%(message)s",
-            log_colors=log_colors,
-        )
-    else:
-        # no colorlog available:
-        sh = logging.StreamHandler()
-        formatter = logging.Formatter("%(name)s:%(levelname)s:%(message)s")
+    sh = colorlog.StreamHandler()
+    log_colors = {
+        "DEBUG": "cyan",
+        "INFO": "green",
+        "WARNING": "yellow",
+        "ERROR": "red",
+        "CRITICAL": "red",
+    }
+    formatter = colorlog.ColoredFormatter(
+        "%(log_color)s%(levelname)s: %(message)s",
+        log_colors=log_colors,
+    )
     sh.setFormatter(formatter)
     sh.setLevel(sh_level)
     _logger.addHandler(sh)
