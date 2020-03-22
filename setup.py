@@ -59,10 +59,16 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "zk_web = verzettler.bin.zk_web:cli",
+            "zk_add_id = verzettler.bin.zk_add_id:cli",
+            "zk_find_id = verzettler.bin.zk_find_id:cli",
+            "zk_get_id = verzettler.bin.zk_get_id:cli",
+            "zk_list_tags = verzettler.bin.zk_list_tags:cli",
             "zk_modify_tags = verzettler.bin.zk_modify_tags:cli",
+            "zk_open = verzettler.bin.zk_open:cli",
+            "zk_stats = verzettler.bin.zk_stats:cli",
+            "zk_touch = verzettler.bin.zk_touch:cli",
             "zk_transform = verzettler.bin.zk_transform:cli",
-            "zk_open = verzettler.bin.zk_open:cli"
+            "zk_web = verzettler.bin.zk_web:cli",
         ]
     }
 )
