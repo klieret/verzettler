@@ -40,6 +40,16 @@ def add_zk_dirs_arg(parser: argparse.ArgumentParser) -> None:
 
 
 def default_arg_handling(args: argparse.Namespace) -> None:
+    if hasattr(args, "log"):
+        # Has to come first!
+        abbrev2loglevel = {
+            "d": logging.DEBUG,
+            "i": logging.INFO,
+            "w": logging.WARNING,
+            "e": logging.ERROR,
+            "c": logging.CRITICAL,
+        }
+        logger.setLevel(abbrev2loglevel[args.log])
     if hasattr(args, "input"):
         if not args.input:
             args.input = get_zk_base_dirs_from_env()
@@ -51,15 +61,6 @@ def default_arg_handling(args: argparse.Namespace) -> None:
                 "Exit. "
             )
             sys.exit(111)
-    if hasattr(args, "log"):
-        abbrev2loglevel = {
-            "d": logging.DEBUG,
-            "i": logging.INFO,
-            "w": logging.WARNING,
-            "e": logging.ERROR,
-            "c": logging.CRITICAL,
-        }
-        logger.setLevel(abbrev2loglevel[args.log])
 
 
 def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
