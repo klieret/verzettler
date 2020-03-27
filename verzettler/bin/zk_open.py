@@ -75,16 +75,18 @@ def cli():
 
     selection = cli_util.get_path_selection(results)
     if not selection:
+        logger.critical("Nothing found.")
         return
     elif not args.action:
         print(selection)
     else:
+        logger.info(f"Opening {selection.name}.")
+
         if '{file}' not in args.action:
             args.action = args.action + " {file}"
 
         command = args.action.format(file=selection)
         logger.debug(f"Running in system: '{command}'")
-
         subprocess.run(command, shell=True)
 
 

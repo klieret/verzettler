@@ -113,7 +113,7 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
             break
     set_path_autocompleter(results)
     selection = input(colored("Your selection: ", attrs=["bold"]))
-    if selection.isnumeric():
+    if selection.isnumeric() or selection.startswith("-") and selection[1:].isnumeric():
         return results[int(selection)]
     else:
         res = [r for r in results if selection in r.name]
