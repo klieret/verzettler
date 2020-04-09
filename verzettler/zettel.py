@@ -68,13 +68,16 @@ class Zettel(object):
         )
 
     def _format_link(self, zid: str) -> str:
-        rel_path = Path(
-            os.path.relpath(
-                str(self.zettelkasten[zid].path),
-                str(self.path.parent))
-        )
-        link_title = self.zettelkasten[zid].title
-        return f"[[{zid}]] [{link_title}]({rel_path} \"autogen\")"
+        if zid in self.zettelkasten:
+            rel_path = Path(
+                os.path.relpath(
+                    str(self.zettelkasten[zid].path),
+                    str(self.path.parent))
+            )
+            link_title = self.zettelkasten[zid].title
+            return f"[[{zid}]] [{link_title}]({rel_path} \"autogen\")"
+        else:
+            return f"[[{zid}]]"
 
     # Analyze file
     # =========================================================================

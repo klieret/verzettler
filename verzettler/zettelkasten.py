@@ -11,6 +11,7 @@ from colour import Color
 
 # ours
 from verzettler.zettel import Zettel
+from verzettler.log import logger
 
 
 class ColorPicker(ABC):
@@ -129,10 +130,17 @@ class Zettelkasten(object):
         # Add
         for zettel in self.zettels:
             for linked_zid in zettel.links:
-                self.zid2zettel[linked_zid].backlinks.add(zettel.zid)
+                try:
+                    self.zid2zettel[linked_zid].backlinks.add(zettel.zid)
+                except KeyError:
+                    logger.error(f"Could not find zettel with ZID {linked_zid}")
 
     def _update_depths(self, mother="00000000000000", mother_depth=0):
-        mother = self.zid2zettel[mother]
+        try:
+            mother = self.zid2zettel[mother]
+        except KeyError:
+            logger.error(f"Could not find zettel with ZID {mother}")
+            return
         if mother.depth is not None:
             return
         mother.depth = mother_depth
@@ -141,7 +149,10 @@ class Zettelkasten(object):
                 mother=daughter,
                 mother_depth=mother_depth+1
             )
-            self.zid2zettel[daughter].depth = mother_depth + 1
+            try:
+                self.zid2zettel[daughter].depth = mother_depth + 1
+            except KeyError:
+                logger.error(f"Could not find zettel with ZID {daughter}")
 
     # Getting things
     # =========================================================================
@@ -238,8 +249,12 @@ class Zettelkasten(object):
     # Magic
     # =========================================================================
 
+    # todo: provide get method that allows to only warn if not found or something
     def __getitem__(self, item):
         return self.zid2zettel[item]
+
+    def __contains__(self, item):
+        return item in self.zid2zettel
 
     def __repr__(self):
         return f"Zettelkasten({len(self.zid2zettel)})"
