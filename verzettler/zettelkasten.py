@@ -224,6 +224,9 @@ class Zettelkasten(object):
                 f'];'
             )
             for link in zettel.links:
+                if link not in self:
+                    logger.error(f"Didn't find zettel with zid {link}.")
+                    continue
                 if (zettel.zid, link) in drawn_links:
                     continue
                 if zettel.zid not in self.zid2zettel[link].links:
