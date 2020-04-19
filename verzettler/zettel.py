@@ -29,7 +29,6 @@ class Zettel(object):
         self.zid = self.get_zid(path)  # type: str
 
         self.links = []  # type: List[str]
-        self._existing_backlinks = []  # type: List[str]
         self.title = ""
         self.tags = set()  # type: Set[str]
 
@@ -99,7 +98,7 @@ class Zettel(object):
                 self.tags = self._read_tags(md_line.text)
             if len(md_line.current_section) >= 2 and \
                     md_line.current_section[1].lower().strip() == "backlinks":
-                self._existing_backlinks.extend(self.id_regex.findall(md_line.text))
+                pass
             else:
                 self.links.extend(self.id_regex.findall(md_line.text))
 
