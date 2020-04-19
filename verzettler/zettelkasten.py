@@ -220,7 +220,7 @@ class Zettelkasten(object):
                 f'\t{zettel.zid} ['
                 f'label="{zettel.title} ({zettel.depth})" '
                 f'labelURL="file://{zettel.path.resolve()}" '
-                f'color={color_picker.pick(zettel)}'
+                f'color="{color_picker.pick(zettel)}"'
                 f'];'
             )
             for link in zettel.links:
@@ -230,10 +230,10 @@ class Zettelkasten(object):
                 if (zettel.zid, link) in drawn_links:
                     continue
                 if zettel.zid not in self.zid2zettel[link].links:
-                    lines.append(f"\t{zettel.zid} -> {link} [color=black];")
+                    lines.append(f'\t{zettel.zid} -> {link} [color="black"];')
                     drawn_links.append((zettel.zid, link))
                 else:
-                    lines.append(f"\t{zettel.zid} -> {link} [color=black dir=both];")
+                    lines.append(f'\t{zettel.zid} -> {link} [color="black" dir="both"];')
                     drawn_links.extend(
                         [(zettel.zid, link), (link, zettel.zid)]
                     )
