@@ -11,12 +11,13 @@ import networkx as nx
 # ours
 from verzettler.zettel import Zettel
 from verzettler.log import logger
-from verzettler.nodecolorpicker import DepthNodeColorPicker, NodeColorPicker
+from verzettler.nodecolorpicker import ConstantNodeColorPicker, NodeColorPicker
 
 
 class Zettelkasten(object):
 
     def __init__(self, zettels: Optional[List[Zettel]] = None):
+        self.mother = "00000000000000"
         self._zid2zettel = {}  # type: Dict[str, Zettel]
         self._graph = nx.DiGraph()
         if zettels is not None:
@@ -51,39 +52,17 @@ class Zettelkasten(object):
                 maxdepth = max(z.depth, maxdepth)
         return maxdepth
 
-    # Help functions
+    # Graph functions
     # =========================================================================
 
-    def _update_backlinks(self):
-        # Reset
-        for zettel in self.zettels:
-            zettel.backlinks = set()
-        # Add
-        for zettel in self.zettels:
-            for linked_zid in zettel.links:
-                try:
-                    self._zid2zettel[linked_zid].backlinks.add(zettel.zid)
-                except KeyError:
-                    logger.error(f"Could not find zettel with ZID {linked_zid}")
+    def get_backlinks(self, zid):
+        return list(self._graph.predecessors(zid))
 
-    def _update_depths(self, mother="00000000000000", mother_depth=0):
+    def get_depth(self, zid) -> int:
         try:
-            mother = self._zid2zettel[mother]
-        except KeyError:
-            logger.error(f"Could not find zettel with ZID {mother}")
-            return
-        if mother.depth is not None:
-            return
-        mother.depth = mother_depth
-        for daughter in mother.links:
-            self._update_depths(
-                mother=daughter,
-                mother_depth=mother_depth+1
-            )
-            try:
-                self._zid2zettel[daughter].depth = mother_depth + 1
-            except KeyError:
-                logger.error(f"Could not find zettel with ZID {daughter}")
+            return nx.dijkstra_path_length(self._graph, self.mother, zid)
+        except nx.NetworkXError:
+            return 0
 
     # Getting things
     # =========================================================================
@@ -103,6 +82,7 @@ class Zettelkasten(object):
         for zettel in zettels:
             zettel.zettelkasten = self
             self._zid2zettel[zettel.zid] = zettel
+            self._graph.add_node(zettel.zid)
             for link in zettel.links:
                 self._graph.add_edge(zettel.zid, link)
 
@@ -122,30 +102,17 @@ class Zettelkasten(object):
                 ]
             )
 
-    def finalize(self):
-        self._update_backlinks()
-        self._update_depths()
-        self._finalized = True
-
     # MISC
     # =========================================================================
 
-    def transform_all(self, **kwargs) -> None:
-        if not self._finalized:
-            self.finalize()
-        for zettel in self.zettels:
-            zettel.transform_file(**kwargs)
-
     def dot_graph(self, color_picker: Optional[NodeColorPicker] = None) -> str:
-        if not self._finalized:
-            self.finalize()
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
         ]
 
         if color_picker is None:
-            color_picker = DepthNodeColorPicker(self)
+            color_picker = ConstantNodeColorPicker()
 
         drawn_links = []
         for zettel in self.zettels:
@@ -180,7 +147,6 @@ class Zettelkasten(object):
             f"Total number of tags: {len(self.tags)}",
         ]
         return "\n".join(lines)
-
 
     # Magic
     # =========================================================================

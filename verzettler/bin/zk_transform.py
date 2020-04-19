@@ -2,11 +2,14 @@
 
 # ours
 from verzettler.cli_util import init_zk_from_cli
+from verzettler.note_transformer import DefaultTransformer
 
 
 def cli():
     zk, _ = init_zk_from_cli()
-    zk.transform_all()
+    t = DefaultTransformer(zk=zk)
+    for z in zk.zettels:
+        t.transform_write(z)
 
 
 if __name__ == "__main__":

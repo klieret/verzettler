@@ -65,10 +65,10 @@ class ConstantNodeColorPicker(NodeColorPicker):
         return self.color
 
 
+# fixme
 class DepthNodeColorPicker(NodeColorPicker):
 
     def __init__(self, zettelkasten: "Zettelkasten", start_color="#f67280", end_color="#fff7f8"):
-        zettelkasten._update_depths()
         self.colors = list(
             Color(start_color).range_to(Color(end_color), zettelkasten.depth)
         )
