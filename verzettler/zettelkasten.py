@@ -2,86 +2,15 @@
 
 # std
 import os
-from abc import ABC, abstractmethod
 from typing import List, Union, Optional, Iterable, Set
 from pathlib import Path, PurePath
 
 # 3rd
-from colour import Color
 
 # ours
 from verzettler.zettel import Zettel
 from verzettler.log import logger
-
-
-class ColorPicker(ABC):
-
-    @abstractmethod
-    def pick(self, zettel: Zettel):
-        pass
-
-
-class CategoryColorPicker(ColorPicker):
-
-    def __init__(
-            self,
-            zettelkasten: "Zettelkasten",
-            colors: Optional[List[str]] = None
-    ):
-
-        self.zettelkasten = zettelkasten
-        if colors is None:
-            colors = [
-                "#8dd3c7",
-                "#ffffb3",
-                "#bebada",
-                "#fb8072",
-                "#80b1d3",
-                "#fdb462",
-                "#b3de69",
-                "#fccde5",
-                "#d9d9d9",
-                "#bc80bd",
-                "#ccebc5",
-                "#ffed6f",
-            ]
-
-        self.category2color = {
-            c: colors[i % len(colors)]
-            for i, c in enumerate(self.zettelkasten.categories)
-        }
-
-    def pick(self, zettel: Zettel):
-        categories = [t for t in zettel.tags if t.startswith("c_")]
-        if len(categories) != 1:
-            # unfortunately vis.js doesn't support multiple colors
-            return "white"
-        else:
-            return ":".join([self.category2color[c] for c in categories])
-
-
-class ConstantColorPicker(ColorPicker):
-
-    def __init__(self, color= "#8dd3c7"):
-        self.color = color
-
-    def pick(self, zettel: Zettel):
-        return self.color
-
-
-class DepthColorPicker(ColorPicker):
-
-    def __init__(self, zettelkasten: "Zettelkasten", start_color="#f67280", end_color="#fff7f8"):
-        zettelkasten._update_depths()
-        self.colors = list(
-            Color(start_color).range_to(Color(end_color), zettelkasten.depth)
-        )
-
-    def pick(self, zettel: Zettel) -> str:
-        if zettel.depth:
-            return self.colors[zettel.depth-1]
-        else:
-            return self.colors[0]
+from verzettler.nodecolorpicker import DepthNodeColorPicker, NodeColorPicker
 
 
 class Zettelkasten(object):
@@ -112,6 +41,7 @@ class Zettelkasten(object):
     def categories(self) -> Set[str]:
         return set(t for t in self.tags if t.startswith("c_"))
 
+    # todo: should be done with networkx
     @property
     def depth(self) -> int:
         maxdepth = 0
@@ -203,7 +133,7 @@ class Zettelkasten(object):
         for zettel in self.zettels:
             zettel.transform_file(**kwargs)
 
-    def dot_graph(self, color_picker: Optional[ColorPicker] = None) -> str:
+    def dot_graph(self, color_picker: Optional[NodeColorPicker] = None) -> str:
         if not self._finalized:
             self.finalize()
         lines = [
@@ -212,7 +142,7 @@ class Zettelkasten(object):
         ]
 
         if color_picker is None:
-            color_picker = DepthColorPicker(self)
+            color_picker = DepthNodeColorPicker(self)
 
         drawn_links = []
         for zettel in self.zettels:
