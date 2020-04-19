@@ -2,10 +2,11 @@
 
 # std
 import os
-from typing import List, Union, Optional, Iterable, Set
+from typing import List, Union, Optional, Iterable, Set, Dict
 from pathlib import Path, PurePath
 
 # 3rd
+import networkx as nx
 
 # ours
 from verzettler.zettel import Zettel
@@ -16,19 +17,19 @@ from verzettler.nodecolorpicker import DepthNodeColorPicker, NodeColorPicker
 class Zettelkasten(object):
 
     def __init__(self, zettels: Optional[List[Zettel]] = None):
-        self.zid2zettel = {}
-
+        self._zid2zettel = {}  # type: Dict[str, Zettel]
+        self._graph = nx.DiGraph()
         if zettels is not None:
             self.add_zettels(zettels)
 
-        self._finalized = False
+        self._finalized = False  # todo: remove
 
     # Properties
     # =========================================================================
 
     @property
     def zettels(self):
-        return list(self.zid2zettel.values())
+        return list(self._zid2zettel.values())
 
     @property
     def tags(self) -> Set[str]:
@@ -61,13 +62,13 @@ class Zettelkasten(object):
         for zettel in self.zettels:
             for linked_zid in zettel.links:
                 try:
-                    self.zid2zettel[linked_zid].backlinks.add(zettel.zid)
+                    self._zid2zettel[linked_zid].backlinks.add(zettel.zid)
                 except KeyError:
                     logger.error(f"Could not find zettel with ZID {linked_zid}")
 
     def _update_depths(self, mother="00000000000000", mother_depth=0):
         try:
-            mother = self.zid2zettel[mother]
+            mother = self._zid2zettel[mother]
         except KeyError:
             logger.error(f"Could not find zettel with ZID {mother}")
             return
@@ -80,7 +81,7 @@ class Zettelkasten(object):
                 mother_depth=mother_depth+1
             )
             try:
-                self.zid2zettel[daughter].depth = mother_depth + 1
+                self._zid2zettel[daughter].depth = mother_depth + 1
             except KeyError:
                 logger.error(f"Could not find zettel with ZID {daughter}")
 
@@ -101,7 +102,9 @@ class Zettelkasten(object):
         self._finalized = False
         for zettel in zettels:
             zettel.zettelkasten = self
-            self.zid2zettel[zettel.zid] = zettel
+            self._zid2zettel[zettel.zid] = zettel
+            for link in zettel.links:
+                self._graph.add_edge(zettel.zid, link)
 
     def add_zettels_from_directory(
             self,
@@ -159,7 +162,7 @@ class Zettelkasten(object):
                     continue
                 if (zettel.zid, link) in drawn_links:
                     continue
-                if zettel.zid not in self.zid2zettel[link].links:
+                if zettel.zid not in self._zid2zettel[link].links:
                     lines.append(f'\t{zettel.zid} -> {link} [color="black"];')
                     drawn_links.append((zettel.zid, link))
                 else:
@@ -173,7 +176,7 @@ class Zettelkasten(object):
 
     def stats_string(self) -> str:
         lines = [
-            f"Total number of notes: {len(self.zid2zettel)}",
+            f"Total number of notes: {len(self._zid2zettel)}",
             f"Total number of tags: {len(self.tags)}",
         ]
         return "\n".join(lines)
@@ -184,10 +187,10 @@ class Zettelkasten(object):
 
     # todo: provide get method that allows to only warn if not found or something
     def __getitem__(self, item):
-        return self.zid2zettel[item]
+        return self._zid2zettel[item]
 
     def __contains__(self, item):
-        return item in self.zid2zettel
+        return item in self._zid2zettel
 
     def __repr__(self):
-        return f"Zettelkasten({len(self.zid2zettel)})"
+        return f"Zettelkasten({len(self._zid2zettel)})"
