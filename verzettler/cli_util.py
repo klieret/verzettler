@@ -13,7 +13,6 @@ import logging
 from termcolor import colored
 
 # ours
-from verzettler.zettelkasten import Zettelkasten
 from verzettler.util import get_zk_base_dirs_from_env, pass_fct
 from verzettler.log import logger
 
@@ -64,7 +63,8 @@ def default_arg_handling(args: argparse.Namespace) -> None:
 
 
 def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
-        -> Tuple[Zettelkasten, argparse.Namespace]:
+        -> Tuple["Zettelkasten", argparse.Namespace]:
+    from verzettler.zettelkasten import Zettelkasten
     parser = argparse.ArgumentParser()
     add_zk_dirs_arg(parser)
     add_debug_args(parser)
