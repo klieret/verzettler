@@ -9,16 +9,16 @@ from pathlib import Path, PurePath
 import networkx as nx
 
 # ours
-from verzettler.zettel import Zettel
+from verzettler.note import Note
 from verzettler.log import logger
 from verzettler.nodecolorpicker import ConstantNodeColorPicker, NodeColorPicker
 
 
 class Zettelkasten(object):
 
-    def __init__(self, zettels: Optional[List[Zettel]] = None):
+    def __init__(self, zettels: Optional[List[Note]] = None):
         self.mother = "00000000000000"
-        self._zid2zettel = {}  # type: Dict[str, Zettel]
+        self._zid2zettel = {}  # type: Dict[str, Note]
         self._graph = nx.DiGraph()
         if zettels is not None:
             self.add_zettels(zettels)
@@ -29,13 +29,13 @@ class Zettelkasten(object):
     # =========================================================================
 
     @property
-    def zettels(self):
+    def notes(self):
         return list(self._zid2zettel.values())
 
     @property
     def tags(self) -> Set[str]:
         tags = set()
-        for z in self.zettels:
+        for z in self.notes:
             tags |= z.tags
         return tags
 
@@ -47,7 +47,7 @@ class Zettelkasten(object):
     @property
     def depth(self) -> int:
         maxdepth = 0
-        for z in self.zettels:
+        for z in self.notes:
             if z.depth is not None:
                 maxdepth = max(z.depth, maxdepth)
         return maxdepth
@@ -67,26 +67,26 @@ class Zettelkasten(object):
     # Getting things
     # =========================================================================
 
-    def get_by_path(self, path: Union[str, PurePath]) -> Zettel:
+    def get_by_path(self, path: Union[str, PurePath]) -> Note:
         path = Path(path)
         # fixme
-        res = [z for z in self.zettels if z.path.name == path.name]
+        res = [z for z in self.notes if z.path.name == path.name]
         assert len(res) == 1, (path.name, res)
         return res[0]
 
     # Extending collection
     # =========================================================================
 
-    def add_zettels(self, zettels: Iterable[Zettel]) -> None:
+    def add_zettels(self, notes: Iterable[Note]) -> None:
         self._finalized = False
-        for zettel in zettels:
-            zettel.zettelkasten = self
-            self._zid2zettel[zettel.zid] = zettel
-            self._graph.add_node(zettel.zid)
-            for link in zettel.links:
-                self._graph.add_edge(zettel.zid, link)
+        for note in notes:
+            note.zettelkasten = self
+            self._zid2zettel[note.nid] = note
+            self._graph.add_node(note.nid)
+            for link in note.links:
+                self._graph.add_edge(note.nid, link)
 
-    def add_zettels_from_directory(
+    def add_notes_from_directory(
             self,
             directory: Union[PurePath, str]
     ) -> None:
@@ -96,7 +96,7 @@ class Zettelkasten(object):
             dirs[:] = [d for d in dirs if d not in [".git"]]
             self.add_zettels(
                 [
-                    Zettel(Path(root) / file)
+                    Note(Path(root) / file)
                     for file in files
                     if file.endswith(".md")
                 ]
@@ -115,27 +115,27 @@ class Zettelkasten(object):
             color_picker = ConstantNodeColorPicker()
 
         drawn_links = []
-        for zettel in self.zettels:
+        for note in self.notes:
             lines.append(
-                f'\t{zettel.zid} ['
-                f'label="{zettel.title} ({zettel.depth})" '
-                f'labelURL="file://{zettel.path.resolve()}" '
-                f'color="{color_picker.pick(zettel)}"'
+                f'\t{note.nid} ['
+                f'label="{note.title} ({note.depth})" '
+                f'labelURL="file://{note.path.resolve()}" '
+                f'color="{color_picker.pick(note)}"'
                 f'];'
             )
-            for link in zettel.links:
+            for link in note.links:
                 if link not in self:
-                    logger.error(f"Didn't find zettel with zid {link}.")
+                    logger.error(f"Didn't find note with id {link}.")
                     continue
-                if (zettel.zid, link) in drawn_links:
+                if (note.nid, link) in drawn_links:
                     continue
-                if zettel.zid not in self._zid2zettel[link].links:
-                    lines.append(f'\t{zettel.zid} -> {link} [color="black"];')
-                    drawn_links.append((zettel.zid, link))
+                if note.nid not in self._zid2zettel[link].links:
+                    lines.append(f'\t{note.nid} -> {link} [color="black"];')
+                    drawn_links.append((note.nid, link))
                 else:
-                    lines.append(f'\t{zettel.zid} -> {link} [color="black" dir="both"];')
+                    lines.append(f'\t{note.nid} -> {link} [color="black" dir="both"];')
                     drawn_links.extend(
-                        [(zettel.zid, link), (link, zettel.zid)]
+                        [(note.nid, link), (link, note.nid)]
                     )
 
         lines.append("}")

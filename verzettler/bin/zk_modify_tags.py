@@ -26,10 +26,10 @@ def cli():
             default=set(),
         )
         parser.add_argument(
-            "-z",
-            "--zettel",
+            "-n",
+            "--notes",
             nargs="+",
-            help="The zettel that should be transformed.",
+            help="The note that should be transformed.",
         )
 
     zk, args = init_zk_from_cli(
@@ -42,9 +42,10 @@ def cli():
         tags -= set(args.remove)
         return tags
 
-    for path in args.zettel:
+    for path in args.notes:
         path = Path(path).resolve()
         z = zk.get_by_path(path)
+        # fixme
         z.transform_file(tag_transformer=tag_transformer)
 
 

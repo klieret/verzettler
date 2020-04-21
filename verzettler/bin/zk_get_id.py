@@ -5,12 +5,12 @@ from typing import List
 import argparse
 
 # ours
-from verzettler.zettel import Zettel
+from verzettler.note import Note
 import verzettler.cli_util as cli_util
 
 
 def get_id(string: str) -> str:
-    res = Zettel.id_regex.findall(string)
+    res = Note.id_regex.findall(string)
     if len(res) == 0:
         return "none"
     elif len(res) == 1:

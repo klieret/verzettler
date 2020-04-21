@@ -10,7 +10,7 @@ from verzettler.markdown_reader import MarkdownReader
 
 
 
-class Zettel(object):
+class Note(object):
 
     id_regex = re.compile("(?<=[^0-9])[0-9]{14}(?=[^0-9])")
     id_link_regex = re.compile(r"\[\[[0-9]{14}\]\]")
@@ -21,7 +21,7 @@ class Zettel(object):
 
     def __init__(self, path: Path):
         self.path = path
-        self.zid = self.get_zid(path)  # type: str
+        self.nid = self.get_nid(path)  # type: str
 
         self.links = []  # type: List[str]
         self.title = ""
@@ -36,8 +36,8 @@ class Zettel(object):
     # =========================================================================
 
     @classmethod
-    def get_zid(cls, path: Union[str, PurePath]) -> str:
-        """ Zettel ID"""
+    def get_nid(cls, path: Union[str, PurePath]) -> str:
+        """ Note ID"""
         path = PurePath(path)
         matches = cls.id_regex.findall(path.name)
         if matches:
@@ -81,4 +81,4 @@ class Zettel(object):
     # =========================================================================
 
     def __repr__(self):
-        return f"Zettel({self.zid})"
+        return f"Note({self.nid})"

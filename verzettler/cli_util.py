@@ -74,7 +74,7 @@ def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
 
     zk = Zettelkasten()
     for inpt_dir in args.input:
-        zk.add_zettels_from_directory(inpt_dir)
+        zk.add_notes_from_directory(inpt_dir)
 
     return zk, args
 

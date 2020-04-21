@@ -8,12 +8,12 @@ from typing import Optional, List
 from colour import Color
 
 # ours
-from verzettler.zettel import Zettel
+from verzettler.note import Note
 
 class NodeColorPicker(ABC):
 
     @abstractmethod
-    def pick(self, zettel: Zettel):
+    def pick(self, note: Note):
         pass
 
 
@@ -47,8 +47,8 @@ class CategoryNodeColorPicker(NodeColorPicker):
             for i, c in enumerate(self.zettelkasten.categories)
         }
 
-    def pick(self, zettel: Zettel):
-        categories = [t for t in zettel.tags if t.startswith("c_")]
+    def pick(self, note: Note):
+        categories = [t for t in note.tags if t.startswith("c_")]
         if len(categories) != 1:
             # unfortunately vis.js doesn't support multiple colors
             return "white"
@@ -61,7 +61,7 @@ class ConstantNodeColorPicker(NodeColorPicker):
     def __init__(self, color= "#8dd3c7"):
         self.color = color
 
-    def pick(self, zettel: Zettel):
+    def pick(self, note: Note):
         return self.color
 
 
@@ -73,8 +73,8 @@ class DepthNodeColorPicker(NodeColorPicker):
             Color(start_color).range_to(Color(end_color), zettelkasten.depth)
         )
 
-    def pick(self, zettel: Zettel) -> str:
-        if zettel.depth:
-            return self.colors[zettel.depth-1]
+    def pick(self, note: Note) -> str:
+        if note.depth:
+            return self.colors[note.depth - 1]
         else:
             return self.colors[0]

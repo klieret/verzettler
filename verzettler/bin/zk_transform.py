@@ -8,7 +8,7 @@ from verzettler.note_transformer import DefaultTransformer
 def cli():
     zk, _ = init_zk_from_cli()
     t = DefaultTransformer(zk=zk)
-    for z in zk.zettels:
+    for z in zk.notes:
         t.transform_write(z)
 
 
