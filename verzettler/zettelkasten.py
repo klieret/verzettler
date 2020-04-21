@@ -160,3 +160,6 @@ class Zettelkasten(object):
 
     def __repr__(self):
         return f"Zettelkasten({len(self._zid2zettel)})"
+
+    def __len__(self):
+        return len(self._zid2zettel)

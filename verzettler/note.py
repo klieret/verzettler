@@ -7,13 +7,13 @@ from pathlib import Path, PurePath
 
 # ours
 from verzettler.markdown_reader import MarkdownReader
-
+from verzettler.log import logger
 
 
 class Note(object):
 
-    id_regex = re.compile("(?<=[^0-9])[0-9]{14}(?=[^0-9])")
-    id_link_regex = re.compile(r"\[\[[0-9]{14}\]\]")
+    id_regex = re.compile("(?<![^0-9])[0-9]{14}(?=[^0-9])")
+    id_link_regex = re.compile(r"\[\[([0-9]{14})\]\]")
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
     markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
@@ -43,6 +43,9 @@ class Note(object):
         if matches:
             return matches[0]
         else:
+            logger.error(
+                "Could not get Note ID. Trying to return name instead."
+            )
             return path.name
 
     # Parsing and formatting helper functions
@@ -63,19 +66,17 @@ class Note(object):
         for md_line in md_reader.lines:
             if len(md_line.current_section) == 1:
                 if self.title and self.title != md_line.current_section[0]:
-                    # todo: form
-                    print(f"{self.path} Warning: Multiple titles. ")
+                    logger.warning(f"{self.path} Warning: Multiple titles. ")
                 self.title = md_line.current_section[0]
             if not md_line.is_code_block and md_line.text.lower().strip().startswith("tags: "):
                 if self.tags:
-                    # todo: form
-                    print(f"{self.path} Warning: Tags were already set.")
+                    logger.warning(f"{self.path} Warning: Tags were already set.")
                 self.tags = self._read_tags(md_line.text)
             if len(md_line.current_section) >= 2 and \
                     md_line.current_section[1].lower().strip() == "backlinks":
                 pass
             else:
-                self.links.extend(self.id_regex.findall(md_line.text))
+                self.links.extend(self.id_link_regex.findall(md_line.text))
 
     # Magic
     # =========================================================================
