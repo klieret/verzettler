@@ -3,6 +3,8 @@
 # std
 from unittest import TestCase
 from pathlib import Path
+from typing import Dict, List
+import re
 
 # ours
 from verzettler.note import Note
@@ -12,6 +14,28 @@ class TestNote(TestCase):
     def setUp(self):
         self.playground = Path(__file__).resolve().parent / "playground"
 
+    def _test_regex_findall_dict(
+            self,
+            regex: re.Pattern,
+            dct: Dict[str, List[str]]
+    ):
+        for test, matches in dct.items():
+            with self.subTest(test=test):
+                self.assertEqual(
+                    matches,
+                    regex.findall(test)
+                )
+
+    def _test_regex_findall_single_match_dict(
+            self,
+            regex: re.Pattern,
+            dct: Dict[str, str]
+    ):
+        return self._test_regex_findall_dict(
+            regex=regex,
+            dct={key: [value] for key, value in dct.items()}
+        )
+
     def test_id_regex(self):
         test2zid = {
             "something_20200416143522.md": "20200416143522",
@@ -19,13 +43,15 @@ class TestNote(TestCase):
             "ml_asdf_20200313225167.md": "20200313225167",
             "20200313225167.md": "20200313225167",
         }
-        for test, zid in test2zid.items():
-            with self.subTest(test=test):
-                print(test)
-                self.assertEqual(
-                    zid,
-                    Note.id_regex.findall(test)[0]
-                )
+        self._test_regex_findall_single_match_dict(Note.id_regex, test2zid)
+
+    def test_link_id_regex(self):
+        test2zid = {
+            "something [[20200416143522]]": "20200416143522",
+            "something [[20200416143522]] else": "20200416143522",
+            "[[20200313225167]]": "20200313225167",
+        }
+        self._test_regex_findall_single_match_dict(Note.id_regex, test2zid)
 
     def get_note_by_fname(self, fname):
         return Note(self.playground / fname)
