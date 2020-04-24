@@ -12,7 +12,7 @@ from verzettler.log import logger
 
 class Note(object):
 
-    id_regex = re.compile("(?<![^0-9])[0-9]{14}(?=[^0-9])")
+    id_regex = re.compile("(?<![0-9])[0-9]{14}(?![0-9])")
     id_link_regex = re.compile(r"\[\[([0-9]{14})\]\]")
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")

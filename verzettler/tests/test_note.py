@@ -12,6 +12,21 @@ class TestNote(TestCase):
     def setUp(self):
         self.playground = Path(__file__).resolve().parent / "playground"
 
+    def test_id_regex(self):
+        test2zid = {
+            "something_20200416143522.md": "20200416143522",
+            "something_20200416143522_else.md": "20200416143522",
+            "ml_asdf_20200313225167.md": "20200313225167",
+            "20200313225167.md": "20200313225167",
+        }
+        for test, zid in test2zid.items():
+            with self.subTest(test=test):
+                print(test)
+                self.assertEqual(
+                    zid,
+                    Note.id_regex.findall(test)[0]
+                )
+
     def get_note_by_fname(self, fname):
         return Note(self.playground / fname)
 
