@@ -20,7 +20,7 @@ def get_search_results(
     sb_params = ["find", ]
     for d in search_dirs:
         sb_params.append(str(d))
-    if not "*" in search_term:
+    if "*" not in search_term:
         if not search_term.endswith(".md"):
             search_term = f"*{search_term}*.md"
         else:
@@ -43,15 +43,7 @@ def get_search_results(
     return [Path(path_str) for path_str in opt.split("\n")]
 
 
-def cli():
-
-    parser = argparse.ArgumentParser()
-    cli_util.add_zk_dirs_arg(parser)
-    cli_util.add_debug_args(parser)
-    parser.add_argument(
-        dest="search",
-        help="Search term",
-    )
+def add_action_option(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-a",
         "--action",
@@ -65,6 +57,29 @@ def cli():
         default="",
         type=str,
     )
+
+
+def handle_action_on_path(action: str, path: Path) -> None:
+    logger.info(f"Running command on {path.name}.")
+
+    if '{file}' not in action:
+        action = action + " {file}"
+
+    command = action.format(file=path)
+    logger.debug(f"Running in system: '{command}'")
+    subprocess.run(command, shell=True)
+
+
+def cli():
+
+    parser = argparse.ArgumentParser()
+    cli_util.add_zk_dirs_arg(parser)
+    cli_util.add_debug_args(parser)
+    parser.add_argument(
+        dest="search",
+        help="Search term",
+    )
+    add_action_option(parser)
     args = parser.parse_args()
     cli_util.default_arg_handling(args)
 
@@ -80,14 +95,7 @@ def cli():
     elif not args.action:
         print(selection)
     else:
-        logger.info(f"Opening {selection.name}.")
-
-        if '{file}' not in args.action:
-            args.action = args.action + " {file}"
-
-        command = args.action.format(file=selection)
-        logger.debug(f"Running in system: '{command}'")
-        subprocess.run(command, shell=True)
+        handle_action_on_path(action=args.action, path=Path(selection))
 
 
 if __name__ == "__main__":
