@@ -112,7 +112,10 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
             print(colored("... Rest omitted", "red"))
             break
     set_path_autocompleter(results)
-    selection = input(colored("Your selection: ", attrs=["bold"]))
+    try:
+        selection = input(colored("Your selection: ", attrs=["bold"]))
+    except KeyboardInterrupt:
+        return None
     if selection.isnumeric() or selection.startswith("-") and selection[1:].isnumeric():
         return results[int(selection)]
     else:
