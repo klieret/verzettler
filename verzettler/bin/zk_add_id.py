@@ -2,7 +2,7 @@
 
 # std
 import argparse
-from pathlib import Path
+from pathlib import Path, PurePath
 import shutil
 
 # ours
@@ -12,7 +12,7 @@ from verzettler.bin.zk_touch import generate_zid
 from verzettler.log import logger
 
 
-def add_id(path: Path) -> Path:
+def add_id(path: PurePath) -> PurePath:
     zid = get_id(path.name)
     if zid == "none":
         zid = generate_zid()
@@ -39,7 +39,7 @@ def cli():
     )
     args = parser.parse_args()
     new_path = add_id(args.file)
-    shutil.move(args.file, new_path)
+    shutil.move(args.file, str(new_path))
 
 
 if __name__ == "__main__":

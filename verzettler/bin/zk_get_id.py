@@ -19,6 +19,15 @@ def get_id(string: str) -> str:
         return "many"
 
 
+def test_get_id():
+    assert get_id("asdf 3234") == "none"
+    assert get_id("") == "none"
+    assert get_id("3234") == "none"
+    assert get_id("12345678901234") == "12345678901234"
+    assert get_id("12345678901234_something") == "12345678901234"
+    assert get_id("12345678901234_12345678901235") == "many"
+
+
 def get_ids(strings: List[str]) -> List[str]:
     return [get_id(string) for string in strings]
 
