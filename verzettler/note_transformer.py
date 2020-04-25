@@ -103,7 +103,7 @@ class DefaultTransformer(NoteTransformer):
             md_line.text = Note.autogen_link_regex.sub("", md_line.text)
 
             # Add new links
-            links = Note.id_link_regex.findall(md_line.text)
+            links = Note.id_link_regex_no_group.findall(md_line.text)
             for link in links:
                 zid = Note.id_regex.findall(link)
                 assert len(zid) == 1

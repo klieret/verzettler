@@ -46,7 +46,7 @@ class JekyllConverter(NoteConverter):
                     remove_line = True
 
             # Replace raw zids, leave only links
-            md_line.text = note.id_link_regex.sub("", md_line.text)
+            md_line.text = note.id_link_regex_no_group.sub("", md_line.text)
 
             # Replace links to md with links to html
             md_line.text = note.markdown_link_regex.sub(

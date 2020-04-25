@@ -14,6 +14,7 @@ class Note(object):
 
     id_regex = re.compile("(?<![0-9])[0-9]{14}(?![0-9])")
     id_link_regex = re.compile(r"\[\[([0-9]{14})\]\]")
+    id_link_regex_no_group = re.compile(r"\[\[[0-9]{14}\]\]")
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
     markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
@@ -44,7 +45,8 @@ class Note(object):
             return matches[0]
         else:
             logger.error(
-                "Could not get Note ID. Trying to return name instead."
+                f"Could not get Note ID for path {path}. "
+                f"Returning name instead."
             )
             return path.name
 
