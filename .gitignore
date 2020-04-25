@@ -5,3 +5,4 @@
 **/__pycache__/**
 *.pyc
 verzettler.egg-info/**
+.coverage
