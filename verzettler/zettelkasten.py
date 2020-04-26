@@ -37,11 +37,12 @@ def _get_tags(notes: Iterable[Note]) -> Set[str]:
         tags |= z.tags
     return tags
 
-def _get_depth(g: nx.DiGraph, root, node: str):
+
+def _get_depth(g: nx.DiGraph, root, node: str, errvalue=0):
     try:
         return nx.dijkstra_path_length(g, root, node)
     except nx.NetworkXNoPath:
-        return 0
+        return errvalue
 
 
 @lru_cache(maxsize=100)
@@ -50,6 +51,13 @@ def _get_notes_by_depth(g: nx.DiGraph, root) -> Dict[int, List[str]]:
     for node in g.nodes:
         nbd[_get_depth(g=g, root=root, node=node)].append(node)
     return nbd
+
+
+@lru_cache(maxsize=1000)
+def _get_k_neighbors(g: nx.DiGraph, root, k=1):
+    return [
+        node for node in g.nodes if 1 <= _get_depth(g, root=root, node=node) <= k
+    ]
 
 
 class Zettelkasten(object):
@@ -112,6 +120,9 @@ class Zettelkasten(object):
         return {
             depth: len(zids) for depth, zids in _get_notes_by_depth(g=self._graph, root=self.root).items()
         }
+
+    def get_neighbors(self, zid, k=1):
+        return self._zids2notes(_get_k_neighbors(g=self._graph, k=k, root=zid))
 
     # Getting things
     # =========================================================================
