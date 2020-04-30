@@ -2,7 +2,7 @@
 
 # std
 import os
-from typing import List, Union, Optional, Iterable, Set, Dict
+from typing import List, Union, Optional, Iterable, Set, Dict, Any
 from pathlib import Path, PurePath
 from functools import lru_cache
 import collections
@@ -38,7 +38,7 @@ def _get_tags(notes: Iterable[Note]) -> Set[str]:
     return tags
 
 
-def _get_depth(g: nx.DiGraph, root, node: str, errvalue=0):
+def _get_depth(g: nx.DiGraph, root, node: Any, errvalue=0):
     try:
         return nx.dijkstra_path_length(g, root, node)
     except nx.NetworkXNoPath:
@@ -46,10 +46,10 @@ def _get_depth(g: nx.DiGraph, root, node: str, errvalue=0):
 
 
 @lru_cache(maxsize=100)
-def _get_notes_by_depth(g: nx.DiGraph, root) -> Dict[int, List[str]]:
-    nbd = collections.defaultdict(list)
+def _get_notes_by_depth(g: nx.DiGraph, root) -> Dict[int, Set[Any]]:
+    nbd = collections.defaultdict(set)
     for node in g.nodes:
-        nbd[_get_depth(g=g, root=root, node=node)].append(node)
+        nbd[_get_depth(g=g, root=root, node=node)].add(node)
     return nbd
 
 
@@ -96,8 +96,8 @@ class Zettelkasten(object):
     # Graph functions
     # =========================================================================
 
-    def _zids2notes(self, zids: Iterable[str]):
-        return [self[zid] for zid in zids]
+    def _zids2notes(self, zids: Iterable[str]) -> Set[Note]:
+        return set(self[zid] for zid in zids)
 
     def get_backlinks(self, zid):
         return list(self._graph.predecessors(zid))
@@ -105,11 +105,11 @@ class Zettelkasten(object):
     def get_depth(self, zid) -> int:
         return _get_depth(g=self._graph, node=zid, root=self.root)
 
-    def get_orphans(self):
-        return [
+    def get_orphans(self) -> Set[Note]:
+        return set(
             self[zid] for zid in _get_orphans(self._graph)
             if not zid == self.root
-        ]
+        )
 
     def get_notes_by_depth(self):
         return {
