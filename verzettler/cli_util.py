@@ -98,8 +98,29 @@ def set_path_autocompleter(results: List[PurePath]) -> None:
     readline.parse_and_bind("tab: complete")
 
 
-def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
-    results.sort(key=lambda p: p.name)
+def get_path_selection(results: List[PurePath], search=None) \
+        -> Optional[PurePath]:
+    """ Given a list of search results for paths to notes, let the user pick
+    the one he wants
+
+    Args:
+        results:
+        search: The original search string. Optional. Can be used to optimize
+            the presentation of results.
+
+    Returns:
+
+    """
+    # We're partial to search results that start with the search string,
+    # so let's show them first.
+    results = sorted(
+        [r for r in results if r.name.startswith(search)],
+        key=lambda p: p.name
+    ) + sorted(
+        [r for r in results if not r.name.startswith(search)],
+        key=lambda p: p.name
+    )
+
     if not results:
         return None
     elif len(results) == 1:
@@ -118,6 +139,9 @@ def get_path_selection(results: List[PurePath]) -> Optional[PurePath]:
         return None
     if selection.isnumeric() or selection.startswith("-") and selection[1:].isnumeric():
         return results[int(selection)]
+    elif selection == "":
+        # Return the first one:
+        return results[0]
     else:
         res = [r for r in results if selection in r.name]
         if not len(res) == 1:

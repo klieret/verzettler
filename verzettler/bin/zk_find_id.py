@@ -26,7 +26,7 @@ def cli():
         search_dirs=args.input,
         search_term=args.search
     )
-    selection = cli_util.get_path_selection(results)
+    selection = cli_util.get_path_selection(results, search=args.search)
     if not selection:
         return
     else:
