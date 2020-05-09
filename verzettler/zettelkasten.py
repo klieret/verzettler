@@ -14,6 +14,7 @@ import networkx as nx
 from verzettler.note import Note
 from verzettler.log import logger
 from verzettler.nodecolorpicker import ConstantNodeColorPicker, NodeColorPicker
+from verzettler.note_converter import NoteConverter
 
 
 # Methods as functions defined here for better caching
@@ -138,7 +139,6 @@ class Zettelkasten(object):
     # =========================================================================
 
     def add_notes(self, notes: Iterable[Note]) -> None:
-        self._finalized = False
         for note in notes:
             note.zettelkasten = self
             self._zid2note[note.nid] = note
@@ -150,7 +150,6 @@ class Zettelkasten(object):
             self,
             directory: Union[PurePath, str]
     ) -> None:
-        self._finalized = False
         directory = Path(directory)
         for root, dirs, files in os.walk(str(directory), topdown=True):
             dirs[:] = [d for d in dirs if d not in [".git"]]
@@ -165,6 +164,7 @@ class Zettelkasten(object):
     # MISC
     # =========================================================================
 
+    # todo: This should also be framed as a converter
     def dot_graph(self, color_picker: Optional[NodeColorPicker] = None) -> str:
         lines = [
             "digraph zettelkasten {",
@@ -209,6 +209,28 @@ class Zettelkasten(object):
             f"Number of links: {self._graph.size()}"
         ]
         return "\n".join(lines)
+
+    def apply_converter(
+            self,
+            converter: NoteConverter,
+            output_basedir: Union[str, PurePath]
+    ):
+        """ Apply converter to all notes in Zettelkasten. The target path for
+        each note will be output_basedir/filename.
+
+        Args:
+            converter:
+            output_basedir:
+
+        Returns:
+
+        """
+        output_basedir = Path(output_basedir)
+        output_basedir.parent.mkdir(exist_ok=True, parents=True)
+        for note in self.notes:
+            new_path = output_basedir / note.path.name
+            converter.convert_write(note, path=new_path)
+
 
     # Magic
     # =========================================================================

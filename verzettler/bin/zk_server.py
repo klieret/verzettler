@@ -21,11 +21,23 @@ for d in get_zk_base_dirs_from_env():
 
 
 @app.route("/open/<program>/<zid>")
-def open(program, zid):
+def open_external(program, zid):
     path = zk[zid].path
     if program == "typora":
         print("Opening typora")
         subprocess.Popen(["typora", path])
+
+
+@app.route("/search/<search>")
+def search(search):
+    results = [zettel for zettel in zk if search in zettel.name or zettel.title]
+    if len(results) == 1:
+        pass
+
+
+@app.route("open/<zid>")
+def open(zid):
+    path = zk[zid].path
 
 
 if __name__ == '__main__':

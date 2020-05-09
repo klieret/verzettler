@@ -52,7 +52,8 @@ def default_arg_handling(args: argparse.Namespace) -> None:
     if hasattr(args, "input"):
         if not args.input:
             args.input = get_zk_base_dirs_from_env()
-            logger.debug(f"Got zk directories {args.input} from env.")
+            dirs = ", ".join(list(map(str, args.input)))
+            logger.debug(f"Got zk directories {dirs} from env.")
         if not args.input:
             logger.critical(
                 "Zettelkasten input directories were neither specified by "
