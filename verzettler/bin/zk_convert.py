@@ -13,7 +13,7 @@ from verzettler.util import get_jekyll_home_from_env
 def cli():
     zk, _ = init_zk_from_cli()  # type: Zettelkasten
     t = JekyllConverter()
-    jekyll_dir = get_jekyll_home_from_env()
+    jekyll_dir = get_jekyll_home_from_env() / "pages"
     if jekyll_dir is None:
         raise ValueError("Need to set jekyll dir in environment variables")
     zk.apply_converter(t, output_basedir=jekyll_dir)
