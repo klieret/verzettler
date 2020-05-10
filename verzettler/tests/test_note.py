@@ -53,6 +53,16 @@ class TestNote(TestCase):
         }
         self._test_regex_findall_single_match_dict(Note.id_regex, test2zid)
 
+    def test_external_link_regex(self):
+        dct = {
+            '[a](asdf.md "autogen")': [],
+            '[a](asdf.md)': [],
+            '[a](https://a/b/c/x.html)': [("a", "https://a/b/c/x.html")],
+            '[a](https://a/b/c/x.html "something")': [("a", 'https://a/b/c/x.html "something"')]
+        }
+        self._test_regex_findall_dict(Note.external_link_regex, dct)
+
+
     def get_note_by_fname(self, fname):
         return Note(self.playground / fname)
 

@@ -18,7 +18,7 @@ class Note(object):
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
     markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
-    external_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*)\)(?<!\.md\))")
+    external_link_regex = re.compile(r"\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)")
     section_regex = re.compile(r"(#+)\s+(.+)")
 
     def __init__(self, path: Path):
