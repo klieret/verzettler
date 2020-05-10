@@ -54,6 +54,12 @@ class JekyllConverter(NoteConverter):
                 md_line.text
             )
 
+            # Mark external links with a '*'
+            md_line.text = note.external_link_regex.sub(
+                r"[*\1](\2)",
+                md_line.text
+            )
+
             if not remove_line:
                 out_lines.append(md_line.text)
 

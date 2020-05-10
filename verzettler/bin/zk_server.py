@@ -69,6 +69,7 @@ def asset(path: str):
     print(path, realpath)
     return app.send_static_file(str(realpath))
 
+
 if __name__ == '__main__':
     app.logger.setLevel(logging.DEBUG)
     app.run()
