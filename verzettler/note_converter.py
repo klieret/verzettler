@@ -42,6 +42,12 @@ class JekyllConverter(NoteConverter):
         ]
         md_reader = MarkdownReader.from_file(note.path)
         for i, md_line in enumerate(md_reader.lines):
+
+            if i == 1:
+                out_lines.append(
+                    f"[Open in typora](/open/typora/{note.nid})\n\n"
+                )
+
             remove_line = False
             if not md_line.is_code_block:
                 if md_line.text.startswith("# "):
@@ -50,7 +56,7 @@ class JekyllConverter(NoteConverter):
 
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
-                r"[*\1](\2)",
+                r"[!\1](\2)",
                 md_line.text
             )
 
@@ -65,8 +71,8 @@ class JekyllConverter(NoteConverter):
             for nid in nids:
                 n = self.zk[nid]
                 title = n.title
-                fname = n.path.stem
-                md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}]({fname}.html)")
+                nid = n.nid
+                md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}](/open/{nid})")
 
 
 

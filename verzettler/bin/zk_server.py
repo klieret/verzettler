@@ -31,14 +31,15 @@ for d in get_zk_base_dirs_from_env():
     zk.add_notes_from_directory(d)
 
 
-
-
 @app.route("/open/<program>/<zid>")
 def open_external(program, zid):
     path = zk[zid].path
     if program == "typora":
         print("Opening typora")
         subprocess.Popen(["typora", path])
+        return open(zid)
+    else:
+        return "Invalid program"
 
 
 @app.route("/search/<search>")
@@ -61,7 +62,6 @@ def open(notespec: str):
     else:
         name = Path(notespec).stem
     jekyll_html_path = Path("_site") / "pages" / (name + ".html")
-    print(jekyll_html_path)
     return render_template(str(jekyll_html_path))
 
 
