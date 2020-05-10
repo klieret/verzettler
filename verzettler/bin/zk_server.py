@@ -22,6 +22,8 @@ logger.debug(f"Jekyll home is {jekyll_home}")
 
 app = Flask(__name__, template_folder=jekyll_home, static_folder=jekyll_home)
 app.config['SECRET_KEY'] = 'asfnfl1232#'
+# Disable caching https://stackoverflow.com/questions/34066804/
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
 zk = Zettelkasten()
