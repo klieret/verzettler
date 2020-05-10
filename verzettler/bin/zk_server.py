@@ -4,15 +4,17 @@
 import subprocess
 import logging
 from pathlib import Path
+import threading
 
 # 3rd
 from flask import Flask
-from flask import render_template
+from flask import render_template, redirect
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
 from verzettler.util import get_zk_base_dirs_from_env, get_jekyll_home_from_env
 from verzettler.log import logger
+from verzettler.note_converter import JekyllConverter
 
 
 jekyll_home = get_jekyll_home_from_env()
@@ -22,13 +24,24 @@ logger.debug(f"Jekyll home is {jekyll_home}")
 
 app = Flask(__name__, template_folder=jekyll_home, static_folder=jekyll_home)
 app.config['SECRET_KEY'] = 'asfnfl1232#'
-# Disable caching https://stackoverflow.com/questions/34066804/
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# https://stackoverflow.com/questions/9508667/reload-flask-app-when-template-file-changes
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 zk = Zettelkasten()
 for d in get_zk_base_dirs_from_env():
     zk.add_notes_from_directory(d)
+
+jekyll_converter = JekyllConverter(zk=zk)
+
+
+def reload_note_after_program_exit(proc: subprocess.Popen, nid):
+    print(f"Waiting for {proc.pid} to terminate")
+    proc.wait(timeout=60*30)
+    print(f"{proc.pid} terminated, reloading note")
+    jekyll_dir = get_jekyll_home_from_env() / "pages"
+    jekyll_converter.convert_write(zk[nid], path=jekyll_dir / zk[nid].path.name)
+    print(f"Updated {nid}")
 
 
 @app.route("/open/<program>/<zid>")
@@ -36,8 +49,9 @@ def open_external(program, zid):
     path = zk[zid].path
     if program == "typora":
         print("Opening typora")
-        subprocess.Popen(["typora", path])
-        return open(zid)
+        proc = subprocess.Popen(["typora", path])
+        threading.Thread(target=lambda: reload_note_after_program_exit(proc, zid)).start()
+        return redirect(f"/open/{zid}")
     else:
         return "Invalid program"
 

@@ -164,6 +164,11 @@ class Zettelkasten(object):
     # MISC
     # =========================================================================
 
+    def reload_note(self, nid: str):
+        del self._zid2note[nid]
+        self._graph.remove_node(nid)
+        self.add_notes([Note(self[nid].path)])
+
     # todo: This should also be framed as a converter
     def dot_graph(self, color_picker: Optional[NodeColorPicker] = None) -> str:
         lines = [
