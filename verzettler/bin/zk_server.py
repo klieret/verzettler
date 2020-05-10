@@ -50,7 +50,11 @@ def search(search):
     if len(results) == 1:
         return open(results[0].nid)
     elif len(results) > 1:
-        return ", ".join([result.path.name for result in results])
+        out = "<ul>"
+        for result in results:
+            out += f'<li><a href="/open/{result.nid}">{result.title} ({result.path.stem})</a></li>'
+        out += "</ul>"
+        return out
     else:
         return "No results"
 
@@ -63,6 +67,11 @@ def open(notespec: str):
         name = Path(notespec).stem
     jekyll_html_path = Path("_site") / "pages" / (name + ".html")
     return render_template(str(jekyll_html_path))
+
+
+@app.route("/")
+def root():
+    return open(zk.root)
 
 
 @app.route("/assets/<path>")
