@@ -29,6 +29,9 @@ class NoteConverter(ABC):
 
 class JekyllConverter(NoteConverter):
 
+    def __init__(self, zk):
+        self.zk = zk
+
     def convert(self, note: Note) -> str:
         out_lines = [
             "---\n",
@@ -45,20 +48,27 @@ class JekyllConverter(NoteConverter):
                     # Already set the title with meta info
                     remove_line = True
 
-            # Replace raw zids, leave only links
-            md_line.text = note.id_link_regex_no_group.sub("", md_line.text)
-
-            # Replace links to md with links to html
-            md_line.text = note.markdown_link_regex.sub(
-                r"[\1](\2.html)",
-                md_line.text
-            )
-
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
                 r"[*\1](\2)",
                 md_line.text
             )
+
+            # Remove old markdown links
+            md_line.text = note.autogen_link_regex.sub(
+                "",
+                md_line.text,
+            )
+
+            # Replace raw zids, leave only links
+            nids = note.id_link_regex.findall(md_line.text)
+            for nid in nids:
+                n = self.zk[nid]
+                title = n.title
+                fname = n.path.stem
+                md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}]({fname}.html)")
+
+
 
             if not remove_line:
                 out_lines.append(md_line.text)

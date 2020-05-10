@@ -58,7 +58,8 @@ class TestNote(TestCase):
             '[a](asdf.md "autogen")': [],
             '[a](asdf.md)': [],
             '[a](https://a/b/c/x.html)': [("a", "https://a/b/c/x.html")],
-            '[a](https://a/b/c/x.html "something")': [("a", 'https://a/b/c/x.html "something"')]
+            '[a](https://a/b/c/x.html "something")': [("a", 'https://a/b/c/x.html "something"')],
+            '[Master](../../szettel/mds/master_00000000000000.md "autogen")': [],
         }
         self._test_regex_findall_dict(Note.external_link_regex, dct)
 
