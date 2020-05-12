@@ -37,3 +37,8 @@ class TestZettelkasten(TestCase):
             set(self.zk.get_backlinks("00000000000003")),
             {"00000000000002"}
         )
+
+    def test_search(self):
+        self.assertEqual(
+            [self.zk["00000000000000"]], self.zk.search("00000000000000")
+        )

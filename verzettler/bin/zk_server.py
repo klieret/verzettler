@@ -56,13 +56,15 @@ def open_external(program, zid):
         return "Invalid program"
 
 
+# todo: search with program
+# todo: fulltext search as an option
 @app.route("/search/<search>")
 def search(search):
     # Split any extensions
     search = Path(search).stem
-    results = [note for note in zk.notes if search in note.path.name or search in note.title or search in note.path.name.replace("_", " ")]
+    results = zk.search(search)
     if len(results) == 1:
-        return open(results[0].nid)
+        return redirect(f"/open/{results[0].nid}")
     elif len(results) > 1:
         out = "<ul>"
         for result in results:
@@ -72,6 +74,14 @@ def search(search):
     else:
         return "No results"
 
+@app.route("/lucky/<search>")
+def search_lucky(search):
+    search = Path(search).stem
+    results = zk.search(search)
+    if results:
+        return redirect(f"/open/{results[0].nid}")
+    else:
+        return "No results"
 
 @app.route("/open/<notespec>")
 def open(notespec: str):

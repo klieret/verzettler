@@ -36,3 +36,12 @@ def get_jekyll_home_from_env() -> Optional[Path]:
 
 def pass_fct(*args, **kwargs):
     pass
+
+
+def remove_duplicates(lst: List) -> List:
+    return list(dict.fromkeys(lst))
+
+
+def test_remove_duplicates():
+    assert ["a"] == remove_duplicates(["a", "a", "a"])
+    assert ["a", "b"] == remove_duplicates((["a", "b", "a", "a", "b"]))

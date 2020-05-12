@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # std
+import re
 import os
 from typing import List, Union, Optional, Iterable, Set, Dict, Any
 from pathlib import Path, PurePath
@@ -15,6 +16,7 @@ from verzettler.note import Note
 from verzettler.log import logger
 from verzettler.nodecolorpicker import ConstantNodeColorPicker, NodeColorPicker
 from verzettler.note_converter import NoteConverter
+from verzettler.util import remove_duplicates
 
 
 # Methods as functions defined here for better caching
@@ -134,6 +136,53 @@ class Zettelkasten(object):
         res = [z for z in self.notes if z.path.name == path.name]
         assert len(res) == 1, (path.name, res)
         return res[0]
+
+    def search(self, search: str) -> List[Note]:
+        """ Search. By default we will search in titles and in names.
+
+        Args:
+            search:
+
+        Returns:
+
+        """
+        # Important to keep search results in order
+
+        if Note.id_regex.match(search):
+            return [self._zid2note[search]]
+
+        n_search = search.replace(" ", "_")
+        t_search = search.replace("_", " ")
+
+        if set(search) & {"*", "^", "$"}:
+            name_search_regexp = re.compile(n_search)
+            title_search_regexp = re.compile(t_search)
+            return remove_duplicates([
+                note for note in self.notes
+                if name_search_regexp.match(note.path.name) or
+                   title_search_regexp.match(note.title)
+            ])
+
+        # Keep the order
+        results = []
+        results.extend([
+            note for note in self.notes
+            if Note.id_regex.sub("", note.path.stem).replace("_", " ").strip() == t_search or
+               note.title == t_search
+        ])
+        results.extend([
+            note for note in self.notes
+            if note.path.stem.startswith(n_search)
+               or note.title.startswith(t_search)
+        ])
+        results.extend([
+            note for note in self.notes
+            if n_search in note.path.stem or t_search in note.title
+        ])
+
+        print([r.path.name for r in remove_duplicates(results)])
+
+        return remove_duplicates(results)
 
     # Extending collection
     # =========================================================================

@@ -38,6 +38,7 @@ class JekyllConverter(NoteConverter):
             "layout: page\n",
             f"title: \"{note.title}\"\n",
             "exclude: true\n",  # do not add to menu
+            f"tags: {list(note.tags)}\n"
             "---\n",
         ]
         md_reader = MarkdownReader.from_file(note.path)
