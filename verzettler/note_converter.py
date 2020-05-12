@@ -8,6 +8,7 @@ from pathlib import PurePath, Path
 # ours
 from verzettler.note import Note
 from verzettler.markdown_reader import MarkdownReader
+from verzettler.log import logger
 
 
 class NoteConverter(ABC):
@@ -70,11 +71,12 @@ class JekyllConverter(NoteConverter):
             # Replace raw zids, leave only links
             nids = note.id_link_regex.findall(md_line.text)
             for nid in nids:
-                n = self.zk[nid]
-                title = n.title
-                nid = n.nid
-                md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}](/open/{nid})")
-
+                try:
+                    n = self.zk[nid]
+                    title = n.title
+                    md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}](/open/{nid})")
+                except KeyError:
+                    logger.error(f"Couldn't find note {nid}")
 
 
             if not remove_line:
