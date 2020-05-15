@@ -99,8 +99,11 @@ def set_path_autocompleter(results: List[PurePath]) -> None:
     readline.parse_and_bind("tab: complete")
 
 
-def get_path_selection(results: List[PurePath], search=None) \
-        -> Optional[PurePath]:
+def get_path_selection(
+        results: List[PurePath],
+        search: Optional[str] = None,
+        lucky=False,
+) -> Optional[PurePath]:
     """ Given a list of search results for paths to notes, let the user pick
     the one he wants
 
@@ -108,6 +111,8 @@ def get_path_selection(results: List[PurePath], search=None) \
         results:
         search: The original search string. Optional. Can be used to optimize
             the presentation of results.
+        lucky: Return the first match, without prompting in case there are
+            multiple matches
 
     Returns:
 
@@ -124,7 +129,7 @@ def get_path_selection(results: List[PurePath], search=None) \
 
     if not results:
         return None
-    elif len(results) == 1:
+    elif len(results) == 1 or lucky:
         return results[0]
 
     max_n = max(5, get_n_terminal_rows() - 5)

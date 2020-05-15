@@ -79,6 +79,11 @@ def cli():
         dest="search",
         help="Search term",
     )
+    parser.add_argument(
+        "--lucky",
+        help="Only return first result, do not prompt in case of ambiguity.",
+        action="store_true"
+    )
     add_action_option(parser)
     args = parser.parse_args()
     cli_util.default_arg_handling(args)
@@ -88,7 +93,11 @@ def cli():
         search_term=args.search
     )
 
-    selection = cli_util.get_path_selection(results, search=args.search)
+    selection = cli_util.get_path_selection(
+        results,
+        search=args.search,
+        lucky=args.lucky,
+    )
     if not selection:
         logger.critical("Nothing found.")
         return

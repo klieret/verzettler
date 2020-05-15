@@ -56,6 +56,12 @@ class JekyllConverter(NoteConverter):
                     # Already set the title with meta info
                     remove_line = True
 
+                # Jekyll somehow eats my
+                # '*' characters, causing problems with LaTeX.
+                md_line.text = md_line.text.replace(r"^*", r"^\ast")
+                md_line.text = md_line.text.replace(r"^{**", r"^{\ast\ast")
+                md_line.text = md_line.text.replace(r"^{*", r"^{\ast")
+
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
                 r"[!\1](\2)",

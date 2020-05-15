@@ -69,6 +69,7 @@ setup(
             "zk_touch = verzettler.bin.zk_touch:cli",
             "zk_transform = verzettler.bin.zk_transform:cli",
             "zk_web = verzettler.bin.zk_web:cli",
+            "zk_convert = verzettler.bin.zk_convert:cli",
         ]
     }
 )
