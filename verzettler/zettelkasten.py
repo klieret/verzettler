@@ -127,6 +127,9 @@ class Zettelkasten(object):
     def get_neighbors(self, zid, k=1):
         return self._zids2notes(_get_k_neighbors(g=self._graph, k=k, root=zid))
 
+    def get_ndescendants(self, zid):
+        return len(nx.descendants(self._graph, zid))
+
     # Getting things
     # =========================================================================
 
@@ -219,10 +222,11 @@ class Zettelkasten(object):
         self.add_notes([Note(self[nid].path)])
 
     # todo: This should also be framed as a converter
-    def dot_graph(self, color_picker: Optional[NodeColorPicker] = None) -> str:
+    def dot_graph(self, color_picker: Optional[NodeColorPicker] = None, variable_size=True) -> str:
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
+            "\tedge [splits=true];"
         ]
 
         if color_picker is None:
@@ -230,11 +234,21 @@ class Zettelkasten(object):
 
         drawn_links = []
         for note in self.notes:
+
+            if variable_size:
+                ndescendants = self.get_ndescendants(note.nid)
+                # Not ideal yet: Problem: If an unimportant note points at an
+                # important note, it will have a very large fontsize.
+                fontsize = min(40, 10 + 1.5*max(0, ndescendants-3))
+            else:
+                fontsize = 10
+
             lines.append(
                 f'\t{note.nid} ['
-                f'label="{note.title} ({note.depth})" '
+                f'label="{note.title}" '
                 f'labelURL="file://{note.path.resolve()}" '
                 f'color="{color_picker.pick(note)}"'
+                f'fontsize={fontsize}'
                 f'];'
             )
             for link in note.links:

@@ -82,6 +82,8 @@ def cli():
     parser.add_argument(
         "--lucky",
         help="Only return first result, do not prompt in case of ambiguity.",
+
+
         action="store_true"
     )
     add_action_option(parser)
