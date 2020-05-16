@@ -101,7 +101,8 @@ class Zettelkasten(object):
     # =========================================================================
 
     def _nids2notes(self, nids: Iterable[str]) -> Set[Note]:
-        return set(self[nid] for nid in nids)
+        # todo: warn if problems
+        return set(self[nid] for nid in nids if nid in self)
 
     def get_backlinks(self, nid):
         return list(self._graph.predecessors(nid))
@@ -246,16 +247,18 @@ class Zettelkasten(object):
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
-            "\tedge [splits=true];"
+            "\tedge [splits=true];"  # todo: not working yet
         ]
 
         if color_picker is None:
             color_picker = ConstantNodeColorPicker()
 
         drawn_links = []
-        for note in self.notes:
-            if only_nodes and note.nid not in only_nodes:
-                continue
+        if only_nodes:
+            notes = self._nids2notes(only_nodes)
+        else:
+            notes = self.notes
+        for note in notes:
 
             if variable_size:
                 ndescendants = self.get_ndescendants(note.nid)
@@ -263,7 +266,7 @@ class Zettelkasten(object):
                 # important note, it will have a very large fontsize.
                 fontsize = min(40, 10 + 1.5*max(0, ndescendants-3))
             else:
-                fontsize = 10
+                fontsize = 14
 
             lines.append(
                 f'\t{note.nid} ['
