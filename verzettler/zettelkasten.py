@@ -67,7 +67,7 @@ class Zettelkasten(object):
 
     def __init__(self, zettels: Optional[List[Note]] = None):
         self.root = "00000000000000"
-        self._zid2note = {}  # type: Dict[str, Note]
+        self._nid2note = {}  # type: Dict[str, Note]
         self._graph = nx.DiGraph()
         if zettels is not None:
             self.add_notes(zettels)
@@ -77,11 +77,11 @@ class Zettelkasten(object):
 
     @property
     def notes(self):
-        return list(self._zid2note.values())
+        return list(self._nid2note.values())
 
     @property
     def tags(self) -> Set[str]:
-        return _get_tags(self._zid2note.values())
+        return _get_tags(self._nid2note.values())
 
     @property
     def categories(self) -> Set[str]:
@@ -97,38 +97,53 @@ class Zettelkasten(object):
         return maxdepth
 
     # Graph functions
+    # Mostly a facade around networkx
     # =========================================================================
 
-    def _zids2notes(self, zids: Iterable[str]) -> Set[Note]:
-        return set(self[zid] for zid in zids)
+    def _nids2notes(self, nids: Iterable[str]) -> Set[Note]:
+        return set(self[nid] for nid in nids)
 
-    def get_backlinks(self, zid):
-        return list(self._graph.predecessors(zid))
+    def get_backlinks(self, nid):
+        return list(self._graph.predecessors(nid))
 
-    def get_depth(self, zid) -> int:
-        return _get_depth(g=self._graph, node=zid, root=self.root)
+    def get_depth(self, nid) -> int:
+        return _get_depth(g=self._graph, node=nid, root=self.root)
 
     def get_orphans(self) -> Set[Note]:
         return set(
-            self[zid] for zid in _get_orphans(self._graph)
-            if not zid == self.root
+            self[nid] for nid in _get_orphans(self._graph)
+            if not nid == self.root
         )
 
-    def get_notes_by_depth(self):
+    def get_notes_by_depth(self, root=None):
+        """
+
+        Args:
+            root: If none: Master document
+
+        Returns:
+
+        """
+        if root is None:
+            root = self.root
         return {
-            depth: self._zids2notes(zids) for depth, zids in _get_notes_by_depth(g=self._graph, root=self.root).items()
+            depth: self._nids2notes(nids)
+            for depth, nids in _get_notes_by_depth(g=self._graph, root=root).items()
         }
 
-    def get_nnotes_by_depth(self):
+    def get_nnotes_by_depth(self, root=None):
+        if root is None:
+            root = self.root
         return {
-            depth: len(zids) for depth, zids in _get_notes_by_depth(g=self._graph, root=self.root).items()
+            depth: len(nids)
+            for depth, nids in _get_notes_by_depth(g=self._graph, root=self.root).items()
         }
 
-    def get_neighbors(self, zid, k=1):
-        return self._zids2notes(_get_k_neighbors(g=self._graph, k=k, root=zid))
+    def get_neighbors(self, nid, k=1):
+        return self._nids2notes(_get_k_neighbors(g=self._graph, k=k, root=nid))
 
-    def get_ndescendants(self, zid):
-        return len(nx.descendants(self._graph, zid))
+    def get_ndescendants(self, nid):
+        return len(nx.descendants(self._graph, nid))
 
     # Getting things
     # =========================================================================
@@ -152,7 +167,7 @@ class Zettelkasten(object):
         # Important to keep search results in order
 
         if Note.id_regex.match(search):
-            return [self._zid2note[search]]
+            return [self._nid2note[search]]
 
         n_search = search.replace(" ", "_")
         t_search = search.replace("_", " ")
@@ -193,7 +208,7 @@ class Zettelkasten(object):
     def add_notes(self, notes: Iterable[Note]) -> None:
         for note in notes:
             note.zettelkasten = self
-            self._zid2note[note.nid] = note
+            self._nid2note[note.nid] = note
             self._graph.add_node(note.nid)
             for link in note.links:
                 self._graph.add_edge(note.nid, link)
@@ -217,12 +232,17 @@ class Zettelkasten(object):
     # =========================================================================
 
     def reload_note(self, nid: str):
-        del self._zid2note[nid]
+        del self._nid2note[nid]
         self._graph.remove_node(nid)
         self.add_notes([Note(self[nid].path)])
 
     # todo: This should also be framed as a converter
-    def dot_graph(self, color_picker: Optional[NodeColorPicker] = None, variable_size=True) -> str:
+    def dot_graph(
+            self,
+            color_picker: Optional[NodeColorPicker] = None,
+            variable_size=True,
+            only_nodes: Optional[Set[str]] = None,
+    ) -> str:
         lines = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
@@ -234,6 +254,8 @@ class Zettelkasten(object):
 
         drawn_links = []
         for note in self.notes:
+            if only_nodes and note.nid not in only_nodes:
+                continue
 
             if variable_size:
                 ndescendants = self.get_ndescendants(note.nid)
@@ -252,12 +274,15 @@ class Zettelkasten(object):
                 f'];'
             )
             for link in note.links:
+                if only_nodes and link not in only_nodes:
+                    continue
+
                 if link not in self:
                     logger.error(f"Didn't find note with id {link}.")
                     continue
                 if (note.nid, link) in drawn_links:
                     continue
-                if note.nid not in self._zid2note[link].links:
+                if note.nid not in self._nid2note[link].links:
                     lines.append(f'\t{note.nid} -> {link} [color="black"];')
                     drawn_links.append((note.nid, link))
                 else:
@@ -271,7 +296,7 @@ class Zettelkasten(object):
 
     def stats_string(self) -> str:
         lines = [
-            f"Number of notes: {len(self._zid2note)}",
+            f"Number of notes: {len(self._nid2note)}",
             f"Number of tags: {len(self.tags)}",
             f"Number of orphans: {len(self.get_orphans())} ",
             f"Number of links: {self._graph.size()}"
@@ -305,13 +330,13 @@ class Zettelkasten(object):
 
     # todo: provide get method that allows to only warn if not found or something
     def __getitem__(self, item):
-        return self._zid2note[item]
+        return self._nid2note[item]
 
     def __contains__(self, item):
-        return item in self._zid2note
+        return item in self._nid2note
 
     def __repr__(self):
-        return f"Zettelkasten({len(self._zid2note)})"
+        return f"Zettelkasten({len(self._nid2note)})"
 
     def __len__(self):
-        return len(self._zid2note)
+        return len(self._nid2note)
