@@ -62,7 +62,6 @@ class JekyllConverter(NoteConverter):
             "exclude: true\n",  # do not add to menu
             f"tags: {list(note.tags)}\n"
             "---\n",
-            '<script src="/assets/vis-network.min.js"></script>\n',
         ]
 
         md_reader = MarkdownReader.from_file(note.path)
@@ -126,18 +125,9 @@ class JekyllConverter(NoteConverter):
         # for i in range(1, maxdepth):
         #     selected_nodes |= nbd[i]
         if len(selected_nodes) < 50:
+            out_lines.append('<script src="/assets/vis-network.min.js"></script>\n',)
             dotstr = self.zk.dot_graph(only_nodes=selected_nodes, variable_size=False)
             out_lines.append(self._dotgraph_html.replace("{dotgraph}", dotstr))
-
-        # dotstr = """ digraph Beziehungen {
-        #    nodesep=0.7
-        #    Jutta -> Franz [label="liebt"]
-        #    Bernd -> Franz [label="hasst"]
-        #    Franz -> Bernd [label="hasst"]
-        #    Franz -> Jutta [label="liebt"]
-        #    Bernd -> Jutta [label="liebt"]
-        # }
-        # """
 
         return "".join(out_lines)
 
