@@ -71,10 +71,10 @@ class DefaultTransformer(NoteTransformer):
                 continue
 
             # Change style of headers
-            if not md_line.is_code_block and md_line.text.startswith("==="):
+            if i > 1 and not md_line.is_code_block and md_line.text.startswith("===") and md_reader.lines[i-1].text.strip():
                 out_lines = out_lines[:-1]
                 md_line.text = "# " + md_reader.lines[i - 1].text
-            if not md_line.is_code_block and md_line.text.startswith("---"):
+            if i > 1 and not md_line.is_code_block and md_line.text.startswith("---") and md_reader.lines[i-1].text.strip():
                 out_lines = out_lines[:-1]
                 md_line.text = "## " + md_reader.lines[i - 1].text
 
