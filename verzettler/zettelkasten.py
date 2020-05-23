@@ -271,7 +271,7 @@ class Zettelkasten(object):
             lines.append(
                 f'\t{note.nid} ['
                 f'label="{note.title}" '
-                f'labelURL="file://{note.path.resolve()}" '
+                f'labelURL="http://127.0.0.1:5000/open/{note.nid}" '
                 f'color="{color_picker.pick(note)}"'
                 f'fontsize={fontsize}'
                 f'];'

@@ -42,6 +42,11 @@ class DefaultTransformer(NoteTransformer):
 
     @staticmethod
     def _format_tags(tags: Iterable[str]) -> str:
+        """
+
+        >>> DefaultTransformer._format_tags(["tag1", "tag2"]).strip()
+        'Tags: #tag1 #tag2'
+        """
         return "Tags: " + " ".join(
             "#" + tag for tag in sorted(list(tags))) + "\n"
 

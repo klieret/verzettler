@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from pathlib import PurePath, Path
+import random
 
 # 3rd
 import networkx as nx
@@ -115,12 +116,23 @@ class JekyllConverter(NoteConverter):
         selected_nodes = {note.nid} #self.zk._graph.get_k_neighbors(note.nid)
         try:
             selected_nodes |= set(nx.dijkstra_path(self.zk._graph, self.zk.root, note.nid))
+            for connection in nx.all_simple_paths(self.zk._graph, self.zk.root, note.nid):
+                selected_nodes |= set(connection)
         except nx.exception.NetworkXNoPath:
             logger.warning(f"No path from {self.zk.root} to {note.nid}")
-        for dist in range(3):
-            if len(selected_nodes) > 20:
-                break
-            selected_nodes |= set(nx.descendants_at_distance(self.zk._graph, note.nid, distance=dist))
+        selected_nodes |= set(self.zk._graph.predecessors(note.nid))
+        selected_nodes |= set(nx.descendants_at_distance(self.zk._graph, note.nid, distance=1))
+        optional_nodes = set()
+        for dist in range(2, 3):
+            optional_nodes |= set(nx.descendants_at_distance(self.zk._graph, note.nid, distance=dist))
+        for predecessor in self.zk._graph.predecessors(note.nid):
+            optional_nodes |= set(self.zk._graph.successors(predecessor))
+        optional_nodes -= selected_nodes
+        if len(selected_nodes) < 30:
+            selected_nodes |= set(random.choices(
+                list(optional_nodes),
+                k=min(len(optional_nodes), 30-len(selected_nodes))
+            ))
 
         # for i in range(1, maxdepth):
         #     selected_nodes |= nbd[i]
