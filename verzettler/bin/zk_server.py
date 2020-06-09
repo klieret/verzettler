@@ -9,6 +9,10 @@ import threading
 # 3rd
 from flask import Flask
 from flask import render_template, redirect
+from bokeh.plotting import figure, output_file, save
+from bokeh.embed import components
+import numpy as np
+from bokeh.resources import INLINE
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
@@ -56,6 +60,32 @@ def open_external(program, zid):
         return "Invalid program"
 
 
+@app.route("/dashboard")
+def dashboard():
+    plots = [make_link_histogram()]
+    scripts, divs = list(zip(*plots))
+    js_resources = INLINE.render_js()
+    css_resources = INLINE.render_css()
+    return render_template('dashboard.html', scripts=scripts, divs=divs, js_resources=js_resources, css_resources=css_resources,)
+
+
+def make_link_histogram():
+    plot = figure(plot_height=300, plot_width=800)  # sizing_mode='scale_width'
+
+    data = [len(note.links) for note in zk.notes]
+    bins = [i -0.5 for i in range(20)]
+    hist, edges = np.histogram(data, density=False, bins=bins)
+
+    plot.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:], line_color="white")
+
+    # output_file("test.html")
+    # save(plot)
+
+    script, div = components(plot)
+
+    return script, div
+
+
 # todo: search with program
 # todo: fulltext search as an option
 @app.route("/search/<search>")
@@ -90,6 +120,8 @@ def open(notespec: str):
     else:
         name = Path(notespec).stem
     jekyll_html_path = Path("_site") / "pages" / (name + ".html")
+    # https://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
+    # todo: return app.send_static_file('index.html')
     return render_template(str(jekyll_html_path))
 
 
