@@ -33,9 +33,7 @@ class NoteConverter(ABC):
             outf.write(self.convert(note))
 
 
-class JekyllConverter(NoteConverter):
-
-    _dotgraph_html = """
+_dotgraph_html = """
 <div id="mynetwork" style="height: 500px;"></div>
 
 <script type="text/javascript">
@@ -51,7 +49,51 @@ class JekyllConverter(NoteConverter):
     window.open(url);
   });
 </script>
-"""#.replace("'", "\\'").replace("\n", "' + \n'")
+"""
+
+def dotgraph_html(zk, note: Note):
+    # nbd = self.zk.get_notes_by_depth(root=note.nid)
+    # maxdepth = min(2, len(nbd))
+    selected_nodes = {note.nid}  # self.zk._graph.get_k_neighbors(note.nid)
+    try:
+        selected_nodes |= set(
+            nx.dijkstra_path(zk._graph, zk.root, note.nid))
+        for connection in nx.all_simple_paths(zk._graph, zk.root,
+                                              note.nid):
+            selected_nodes |= set(connection)
+    except nx.exception.NetworkXNoPath:
+        logger.warning(f"No path from {zk.root} to {note.nid}")
+    selected_nodes |= set(zk._graph.predecessors(note.nid))
+    selected_nodes |= set(
+        nx.descendants_at_distance(zk._graph, note.nid, distance=1))
+    optional_nodes = set()
+    for dist in range(2, 3):
+        optional_nodes |= set(
+            nx.descendants_at_distance(zk._graph, note.nid, distance=dist))
+    for predecessor in zk._graph.predecessors(note.nid):
+        optional_nodes |= set(zk._graph.successors(predecessor))
+    optional_nodes -= selected_nodes
+    if len(selected_nodes) < 30:
+        selected_nodes |= set(random.choices(
+            list(optional_nodes),
+            k=min(len(optional_nodes), 30 - len(selected_nodes))
+        ))
+
+    # for i in range(1, maxdepth):
+    #     selected_nodes |= nbd[i]
+    out_lines = []
+    if len(selected_nodes) < 50:
+        out_lines.append(
+            '<script src="/assets/vis-network.min.js"></script>\n', )
+        dotstr = zk.dot_graph(only_nodes=selected_nodes,
+                                   variable_size=False)
+        out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr))
+    return out_lines
+
+
+class JekyllConverter(NoteConverter):
+
+    #.replace("'", "\\'").replace("\n", "' + \n'")
 
     def __init__(self, zk):
         self.zk = zk
@@ -112,36 +154,9 @@ class JekyllConverter(NoteConverter):
             if not remove_line:
                 out_lines.append(md_line.text)
 
-        # nbd = self.zk.get_notes_by_depth(root=note.nid)
-        # maxdepth = min(2, len(nbd))
-        selected_nodes = {note.nid} #self.zk._graph.get_k_neighbors(note.nid)
-        try:
-            selected_nodes |= set(nx.dijkstra_path(self.zk._graph, self.zk.root, note.nid))
-            for connection in nx.all_simple_paths(self.zk._graph, self.zk.root, note.nid):
-                selected_nodes |= set(connection)
-        except nx.exception.NetworkXNoPath:
-            logger.warning(f"No path from {self.zk.root} to {note.nid}")
-        selected_nodes |= set(self.zk._graph.predecessors(note.nid))
-        selected_nodes |= set(nx.descendants_at_distance(self.zk._graph, note.nid, distance=1))
-        optional_nodes = set()
-        for dist in range(2, 3):
-            optional_nodes |= set(nx.descendants_at_distance(self.zk._graph, note.nid, distance=dist))
-        for predecessor in self.zk._graph.predecessors(note.nid):
-            optional_nodes |= set(self.zk._graph.successors(predecessor))
-        optional_nodes -= selected_nodes
-        if len(selected_nodes) < 30:
-            selected_nodes |= set(random.choices(
-                list(optional_nodes),
-                k=min(len(optional_nodes), 30-len(selected_nodes))
-            ))
-
-        # for i in range(1, maxdepth):
-        #     selected_nodes |= nbd[i]
-        if len(selected_nodes) < 50:
-            out_lines.append('<script src="/assets/vis-network.min.js"></script>\n',)
-            dotstr = self.zk.dot_graph(only_nodes=selected_nodes, variable_size=False)
-            out_lines.append(self._dotgraph_html.replace("{dotgraph}", dotstr))
-
+        
+        out_lines.extend(dotgraph_html(self.zk, note))
+        
         return "".join(out_lines)
 
 
@@ -199,6 +214,9 @@ class PandocConverter(NoteConverter):
 
             if not remove_line:
                 out_lines.append(md_line.text)
+
+        out_lines.extend(dotgraph_html(self.zk, note))
+
         return "".join(out_lines)
 
     def convert(self, note: Note) -> str:
