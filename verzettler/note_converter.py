@@ -169,6 +169,10 @@ class PandocConverter(NoteConverter):
                 )
 
             remove_line = False
+            if not md_line.is_code_block:
+                if md_line.text.startswith("# ") and not self.self_contained:
+                    # Already set the title with meta info
+                    remove_line = True
 
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
