@@ -9,11 +9,13 @@ from colour import Color
 
 # ours
 from verzettler.note import Note
+from verzettler.zettelkasten import Zettelkasten
+
 
 class NodeColorPicker(ABC):
 
     @abstractmethod
-    def pick(self, note: Note):
+    def __call__(self, note: Note):
         pass
 
 
@@ -21,7 +23,7 @@ class CategoryNodeColorPicker(NodeColorPicker):
 
     def __init__(
             self,
-            zettelkasten: "Zettelkasten",
+            zettelkasten: Zettelkasten,
             colors: Optional[List[str]] = None
     ):
 
@@ -47,7 +49,7 @@ class CategoryNodeColorPicker(NodeColorPicker):
             for i, c in enumerate(self.zettelkasten.categories)
         }
 
-    def pick(self, note: Note):
+    def __call__(self, note: Note):
         categories = [t for t in note.tags if t.startswith("c_")]
         if len(categories) != 1:
             # unfortunately vis.js doesn't support multiple colors
@@ -56,24 +58,19 @@ class CategoryNodeColorPicker(NodeColorPicker):
             return ":".join([self.category2color[c] for c in categories])
 
 
-class ConstantNodeColorPicker(NodeColorPicker):
-
-    def __init__(self, color= "#8dd3c7"):
-        self.color = color
-
-    def pick(self, note: Note):
-        return self.color
-
-
-# fixme
 class DepthNodeColorPicker(NodeColorPicker):
 
-    def __init__(self, zettelkasten: "Zettelkasten", start_color="#f67280", end_color="#fff7f8"):
+    def __init__(
+            self,
+            zettelkasten: Zettelkasten,
+            start_color="#f67280",
+            end_color="#fff7f8"
+    ):
         self.colors = list(
             Color(start_color).range_to(Color(end_color), zettelkasten.depth)
         )
 
-    def pick(self, note: Note) -> str:
+    def __call__(self, note: Note) -> str:
         if note.depth:
             return self.colors[note.depth - 1]
         else:
