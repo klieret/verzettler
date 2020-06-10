@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block body %}
+    {% for script in scripts %}
+        {{ script|indent(4)|safe }}
+    {% endfor %}
+    {% for div in divs %}
+        {{ div|indent(4)|safe }}
+    {% endfor %}
+{% endblock %}

@@ -16,17 +16,16 @@ from bokeh.resources import INLINE
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.util import get_zk_base_dirs_from_env, get_jekyll_home_from_env
+from verzettler.util import get_zk_base_dirs_from_env
 from verzettler.log import logger
-from verzettler.note_converter import JekyllConverter
+from verzettler.note_converter import PandocConverter
 
 
-jekyll_home = get_jekyll_home_from_env()
-if jekyll_home is None:
-    raise ValueError("Jekyll home not found!")
-logger.debug(f"Jekyll home is {jekyll_home}")
+templates = Path(__file__).resolve().parent.parent / "templates"
+statics = Path(__file__).resolve().parent.parent / "static"
 
-app = Flask(__name__, template_folder=jekyll_home, static_folder=jekyll_home)
+
+app = Flask(__name__, template_folder=templates, static_folder=statics)
 app.config['SECRET_KEY'] = 'asfnfl1232#'
 
 # https://stackoverflow.com/questions/9508667/reload-flask-app-when-template-file-changes
@@ -36,16 +35,17 @@ zk = Zettelkasten()
 for d in get_zk_base_dirs_from_env():
     zk.add_notes_from_directory(d)
 
-jekyll_converter = JekyllConverter(zk=zk)
+# jekyll_converter = JekyllConverter(zk=zk)
+pandoc_converter = PandocConverter(zk=zk, self_contained=False)
 
 
-def reload_note_after_program_exit(proc: subprocess.Popen, nid):
-    print(f"Waiting for {proc.pid} to terminate")
-    proc.wait(timeout=60*30)
-    print(f"{proc.pid} terminated, reloading note")
-    jekyll_dir = get_jekyll_home_from_env() / "pages"
-    jekyll_converter.convert_write(zk[nid], path=jekyll_dir / zk[nid].path.name)
-    print(f"Updated {nid}")
+# def reload_note_after_program_exit(proc: subprocess.Popen, nid):
+#     print(f"Waiting for {proc.pid} to terminate")
+#     proc.wait(timeout=60*30)
+#     print(f"{proc.pid} terminated, reloading note")
+#     jekyll_dir = get_jekyll_home_from_env() / "pages"
+#     jekyll_converter.convert_write(zk[nid], path=jekyll_dir / zk[nid].path.name)
+#     print(f"Updated {nid}")
 
 
 @app.route("/open/<program>/<zid>")
@@ -54,7 +54,7 @@ def open_external(program, zid):
     if program == "typora":
         print("Opening typora")
         proc = subprocess.Popen(["typora", path])
-        threading.Thread(target=lambda: reload_note_after_program_exit(proc, zid)).start()
+        # threading.Thread(target=lambda: reload_note_after_program_exit(proc, zid)).start()
         return redirect(f"/open/{zid}")
     else:
         return "Invalid program"
@@ -115,14 +115,16 @@ def search_lucky(search):
 
 @app.route("/open/<notespec>")
 def open(notespec: str):
+    logger.debug(f"Opening {notespec}")
     if notespec.isnumeric():
-        name = zk[notespec].path.stem
+        note = zk[notespec]
     else:
-        name = Path(notespec).stem
-    jekyll_html_path = Path("_site") / "pages" / (name + ".html")
+        note = zk.get_by_path(notespec)
+    # jekyll_html_path = Path("_site") / "pages" / (name + ".html")
     # https://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
     # todo: return app.send_static_file('index.html')
-    return render_template(str(jekyll_html_path))
+    # return render_template(str(jekyll_html_path))
+    return render_template("page.html", pandoc_output=pandoc_converter.convert(note))
 
 
 @app.route("/")
