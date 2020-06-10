@@ -228,7 +228,7 @@ class PandocConverter(NoteConverter):
 
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
-                r"[!\1](\2)",
+                r'<a href="\2" class="external">\1</a>',
                 md_line.text
             )
 

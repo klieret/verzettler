@@ -431,17 +431,26 @@ code span.vs { color: #4e9a06; } /* VerbatimString */
 code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
 
 
-code {
-  color: #8dd3c7;
-  color: #ffffb3;
-  color: #bebada;
-  color: #fb8072;
-  color: #80b1d3;
-  color: #fdb462;
-  color: #b3de69;
-  color: #fccde5;
-  color: #d9d9d9;
-  color: #bc80bd;
-  color: #ccebc5;
-  color: #ffed6f;
+/*code {*/
+/*  color: #8dd3c7;*/
+/*  color: #ffffb3;*/
+/*  color: #bebada;*/
+/*  color: #fb8072;*/
+/*  color: #80b1d3;*/
+/*  color: #fdb462;*/
+/*  color: #b3de69;*/
+/*  color: #fccde5;*/
+/*  color: #d9d9d9;*/
+/*  color: #bc80bd;*/
+/*  color: #ccebc5;*/
+/*  color: #ffed6f;*/
+/*}*/
+
+/* my styles */
+a.external {
+  color: #c4a000;
 }
+
+/*a.external {*/
+/*  color: #c4a000;*/
+/*}*/
