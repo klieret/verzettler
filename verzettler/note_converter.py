@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from pathlib import PurePath, Path
 import random
+import subprocess
 
 # 3rd
 import networkx as nx
@@ -149,3 +150,44 @@ class JekyllConverter(NoteConverter):
 #             ["pandoc", "-t", "html", "-s", "-c", ""]
 #         )
 
+
+
+class PandocConverter(NoteConverter):
+
+    def __init__(self, zk, self_contained=True):
+        """
+
+        Args:
+            zk:
+            self_contained: If true, let pandoc produce a full HTML page with
+                CSS already included.
+        """
+        self.zk = zk
+        self.self_contained = self_contained
+
+    def convert(self, note: Note) -> str:
+        css_path = Path(__file__).resolve().parent / "html_resources" / "1.css"
+        cmd_parts = [
+            "pandoc",
+            "-t",
+            "html",
+            "--mathjax",
+            "--highlight-style=pygments",
+        ]
+        if self.self_contained:
+            cmd_parts.extend([
+                "--self-contained",
+                f"--css={css_path}",
+                "--metadata",
+                f"pagetitle=\"{note.title}\"",
+            ])
+        cmd_parts.append(f"{note.path}")
+        try:
+            ret = subprocess.run(
+                cmd_parts,
+                capture_output=True,
+                universal_newlines=True
+            )
+        except subprocess.CalledProcessError:
+            raise
+        return ret.stdout
