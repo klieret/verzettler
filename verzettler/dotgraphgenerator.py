@@ -8,7 +8,6 @@ from verzettler.note import Note
 from verzettler.log import logger
 
 
-
 class DotGraphGenerator(object):
     def __init__(self, zk):
         self.prologue = [
@@ -49,7 +48,7 @@ class DotGraphGenerator(object):
         return "\n".join(lines)
 
     def get_color(self, note: Note):
-        return "blue"
+        return "#8dd3c7"
 
     def get_fontsize(self, note: Note):
         return 14
@@ -61,4 +60,3 @@ class DotGraphGenerator(object):
             f'color="{self.get_color(note)}"' \
             f'fontsize={self.get_fontsize(note)}' \
             f'];'
-

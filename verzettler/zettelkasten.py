@@ -14,7 +14,6 @@ import networkx as nx
 # ours
 from verzettler.note import Note
 from verzettler.log import logger
-from verzettler.nodecolorpicker import ConstantNodeColorPicker, NodeColorPicker
 from verzettler.note_converter import NoteConverter
 from verzettler.util import remove_duplicates
 
@@ -236,66 +235,6 @@ class Zettelkasten(object):
         del self._nid2note[nid]
         self._graph.remove_node(nid)
         self.add_notes([Note(self[nid].path)])
-
-    # todo: This should also be framed as a converter
-    def dot_graph(
-            self,
-            color_picker: Optional[NodeColorPicker] = None,
-            variable_size=True,
-            only_nodes: Optional[Set[str]] = None,
-    ) -> str:
-        lines = [
-            "digraph zettelkasten {",
-            "\tnode [shape=box];"
-            "\tedge [splits=true];"  # todo: not working yet
-        ]
-
-        if color_picker is None:
-            color_picker = ConstantNodeColorPicker()
-
-        drawn_links = []
-        if only_nodes:
-            notes = self._nids2notes(only_nodes)
-        else:
-            notes = self.notes
-        for note in notes:
-
-            if variable_size:
-                ndescendants = self.get_ndescendants(note.nid)
-                # Not ideal yet: Problem: If an unimportant note points at an
-                # important note, it will have a very large fontsize.
-                fontsize = min(40, 10 + 1.5*max(0, ndescendants-3))
-            else:
-                fontsize = 14
-
-            lines.append(
-                f'\t{note.nid} ['
-                f'label="{note.title}" '
-                f'labelURL="http://127.0.0.1:5000/open/{note.nid}" '
-                f'color="{color_picker.pick(note)}"'
-                f'fontsize={fontsize}'
-                f'];'
-            )
-            for link in note.links:
-                if only_nodes and link not in only_nodes:
-                    continue
-
-                if link not in self:
-                    logger.error(f"Didn't find note with id {link}.")
-                    continue
-                if (note.nid, link) in drawn_links:
-                    continue
-                if note.nid not in self._nid2note[link].links:
-                    lines.append(f'\t{note.nid} -> {link} [color="black"];')
-                    drawn_links.append((note.nid, link))
-                else:
-                    lines.append(f'\t{note.nid} -> {link} [color="black" dir="both"];')
-                    drawn_links.extend(
-                        [(note.nid, link), (link, note.nid)]
-                    )
-
-        lines.append("}")
-        return "\n".join(lines)
 
     def stats_string(self) -> str:
         lines = [
