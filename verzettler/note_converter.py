@@ -84,7 +84,8 @@ def dotgraph_html(zk, note: Note):
     out_lines = []
     if len(selected_nodes) < 50:
         out_lines.append(
-            '<script src="/assets/vis-network.min.js"></script>\n', )
+            '<script src="/static/js/vis-network.min.js"></script>\n'
+        )
         dotstr = zk.dot_graph(only_nodes=selected_nodes,
                                    variable_size=False)
         out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr))
@@ -215,7 +216,7 @@ class PandocConverter(NoteConverter):
             if not remove_line:
                 out_lines.append(md_line.text)
 
-        out_lines.extend(dotgraph_html(self.zk, note))
+        out_lines.extend(["\n\n"] + dotgraph_html(self.zk, note))
 
         return "".join(out_lines)
 

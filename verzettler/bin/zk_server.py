@@ -223,9 +223,10 @@ def open(notespec: str):
         note = zk[notespec]
     else:
         note = zk.get_by_path(notespec)
+    converted = pandoc_converter.convert(note)
     return render_template(
         "page.html",
-        pandoc_output=pandoc_converter.convert(note),
+        pandoc_output=converted,
         title=note.title
     )
 
