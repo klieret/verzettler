@@ -72,7 +72,7 @@ def dashboard():
     table_data = [
         (f"Number of notes", f"{len(zk._nid2note)}"),
         (f"Number of links", f"{zk._graph.size()}"),
-        (f"Links/note", f"{len(zk._nid2note)/zk._graph.size():.2f}"),
+        (f"Links/note", f"zk._graph.size()/{len(zk._nid2note):.2f}"),
         (f"Number of tags", f"{len(zk.tags)}"),
         (f"Number of orphans", f"{len(zk.get_orphans())} "),
     ]
