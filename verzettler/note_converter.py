@@ -6,6 +6,7 @@ from typing import Optional
 from pathlib import PurePath, Path
 import random
 import subprocess
+import collections
 
 # 3rd
 import networkx as nx
@@ -58,24 +59,36 @@ _dotgraph_html = """
 def dotgraph_html(zk, note: Note):
     # nbd = self.zk.get_notes_by_depth(root=note.nid)
     # maxdepth = min(2, len(nbd))
+
+    categories = collections.defaultdict(set)
     selected_nodes = {note.nid}  # self.zk._graph.get_k_neighbors(note.nid)
+    categories["self"].add(note.nid)
     try:
-        selected_nodes |= set(
-            nx.dijkstra_path(zk._graph, zk.root, note.nid))
-        for connection in nx.all_simple_paths(zk._graph, zk.root,
-                                              note.nid):
-            selected_nodes |= set(connection)
+        # selected_nodes |= set(nx.dijkstra_path(zk._graph, zk.root, note.nid))
+        paths_from_root = set()
+        for connection in nx.all_simple_paths(zk._graph, zk.root, note.nid):
+            paths_from_root |= set(connection)
+        categories["rootpath"] |= paths_from_root
+        selected_nodes |= paths_from_root
     except nx.exception.NetworkXNoPath:
         logger.warning(f"No path from {zk.root} to {note.nid}")
-    selected_nodes |= set(zk._graph.predecessors(note.nid))
-    selected_nodes |= set(
-        nx.descendants_at_distance(zk._graph, note.nid, distance=1))
+    predecessors = set(zk._graph.predecessors(note.nid))
+    categories["predecessors"] |= predecessors
+    selected_nodes |= predecessors
+    descendants = set(nx.descendants_at_distance(zk._graph, note.nid, distance=1))
+    categories["descendants"] |= descendants
+    selected_nodes |= descendants
     optional_nodes = set()
     for dist in range(2, 3):
-        optional_nodes |= set(
-            nx.descendants_at_distance(zk._graph, note.nid, distance=dist))
+        desc = set(
+            nx.descendants_at_distance(zk._graph, note.nid, distance=dist)
+        )
+        categories["descendants"] |= desc
+        optional_nodes |= desc
     for predecessor in zk._graph.predecessors(note.nid):
-        optional_nodes |= set(zk._graph.successors(predecessor))
+        sibl = set(zk._graph.successors(predecessor))
+        categories["siblings"] |= sibl
+        optional_nodes |= sibl
     optional_nodes -= selected_nodes
     if len(selected_nodes) < 30:
         selected_nodes |= set(random.choices(
@@ -83,14 +96,33 @@ def dotgraph_html(zk, note: Note):
             k=min(len(optional_nodes), 30 - len(selected_nodes))
         ))
 
-    # for i in range(1, maxdepth):
-    #     selected_nodes |= nbd[i]
+    def pick_color(note: Note):
+        nid = note.nid
+        if nid in categories["self"]:
+            # red
+            return "#fb8072"
+        elif nid in categories["predecessors"]:
+            # green
+            return "#ccebc5"
+        elif nid in categories["descendants"]:
+            # yellow
+            return "#ffed6f"
+        elif nid in categories["siblings"]:
+            # pink
+            return "#fccde5"
+        elif nid in categories["rootpath"]:
+            # grayish
+            return "#d9d9d9"
+        else:
+            return "red"
+
     out_lines = []
     if len(selected_nodes) < 50:
         out_lines.append(
             '<script src="/static/js/vis-network.min.js"></script>\n'
         )
         dgg = DotGraphGenerator(zk=zk)
+        dgg.get_color = pick_color
         dotstr = dgg.graph_from_notes(selected_nodes)
         out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr).replace("{height}", f"{400 + 10*len(selected_nodes)}px"))
     return out_lines
