@@ -1,9 +1,30 @@
-{% extends "layout.html" %}
-{% block body %}
-    {% for script in scripts %}
-        {{ script|indent(4)|safe }}
-    {% endfor %}
-    {% for div in divs %}
-        {{ div|indent(4)|safe }}
-    {% endfor %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    {{ js_resources|indent(4)|safe }}
+    {{ css_resources|indent(4)|safe }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/1.css') }}">
+  </head>
+  <body>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+          <header class="post-header">
+            <h1 class="post-title"> Dashboard </h1>
+          </header>
+
+          <div class="post-content">
+            {% for script in scripts %}
+                {{ script|indent(4)|safe }}
+            {% endfor %}
+            {% for div in divs %}
+                {{ div|indent(4)|safe }}
+            {% endfor %}
+          </div>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

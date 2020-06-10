@@ -104,6 +104,7 @@ def search(search):
     else:
         return "No results"
 
+
 @app.route("/lucky/<search>")
 def search_lucky(search):
     search = Path(search).stem
@@ -113,6 +114,7 @@ def search_lucky(search):
     else:
         return "No results"
 
+
 @app.route("/open/<notespec>")
 def open(notespec: str):
     logger.debug(f"Opening {notespec}")
@@ -120,11 +122,11 @@ def open(notespec: str):
         note = zk[notespec]
     else:
         note = zk.get_by_path(notespec)
-    # jekyll_html_path = Path("_site") / "pages" / (name + ".html")
-    # https://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
-    # todo: return app.send_static_file('index.html')
-    # return render_template(str(jekyll_html_path))
-    return render_template("page.html", pandoc_output=pandoc_converter.convert(note), title=note.title)
+    return render_template(
+        "page.html",
+        pandoc_output=pandoc_converter.convert(note),
+        title=note.title
+    )
 
 
 @app.route("/")

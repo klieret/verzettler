@@ -7,20 +7,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/1.css') }}">
   </head>
   <body>
+    <main class="page-content" aria-label="Content">
+        <div class="wrapper">
+          <article class="post">
 
-  <main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <article class="post">
+            <header class="post-header">
+              <h1 class="post-title"> {{ title|safe }}</h1>
+            </header>
 
-          <header class="post-header">
-            <h1 class="post-title"> {{ title|safe }}</h1>
-          </header>
-
-          <div class="post-content">
-            {{ pandoc_output|safe }}
-          </div>
-        </article>
-      </div>
-  </main>
+            <div class="post-content">
+              {{ pandoc_output|safe }}
+            </div>
+          </article>
+        </div>
+    </main>
   </body>
 </html>
