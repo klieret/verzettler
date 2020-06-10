@@ -5,6 +5,7 @@ import subprocess
 import logging
 from pathlib import Path
 import threading
+import collections
 
 # 3rd
 from flask import Flask
@@ -63,18 +64,20 @@ def open_external(program, zid):
 
 @app.route("/dashboard")
 def dashboard():
-    plots = [make_link_histogram()]
+    plots = [make_link_histogram(), make_backlink_histogram()]
     plots = [components(plot) for plot in plots]
     scripts, divs = list(zip(*plots))
     js_resources = INLINE.render_js()
     css_resources = INLINE.render_css()
 
+    max_depth = max(zk.get_nnotes_by_depth().keys())
     table_data = [
         (f"Number of notes", f"{len(zk._nid2note)}"),
         (f"Number of links", f"{zk._graph.size()}"),
-        (f"Links/note", f"zk._graph.size()/{len(zk._nid2note):.2f}"),
+        (f"Links/note", f"{zk._graph.size()/len(zk._nid2note):.2f}"),
         (f"Number of tags", f"{len(zk.tags)}"),
         (f"Number of orphans", f"{len(zk.get_orphans())} "),
+        (f"Maximum depth", f"{max_depth}")
     ]
     table = tabulate.tabulate(table_data, tablefmt="html")
 
@@ -88,8 +91,13 @@ def dashboard():
     )
 
 
-def interactive_int_histogram(data, bins, title, x_axis_label,
-                          x_tooltip):
+def interactive_int_histogram(
+        data,
+        bins,
+        title,
+        x_axis_label,
+        x_tooltip
+):
     """Plot interactive histogram using bokeh.
 
     Adapted from https://gist.github.com/bhishanpdl/43f5ddad264c1a712979ddc63dd3d6ee
@@ -164,18 +172,10 @@ def interactive_int_histogram(data, bins, title, x_axis_label,
 
     return p
 
-def make_link_histogram():
-    # plot = figure(plot_height=300, sizing_mode='scale_width')
 
+def make_link_histogram():
     data = [len(note.links) for note in zk.notes]
     bins = [i -0.5 for i in range(20)]
-    # hist, edges = np.histogram(data, density=False, bins=bins)
-
-    # plot.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:], line_color="white")
-
-    # output_file("test.html")
-    # save(plot)
-
     plot = interactive_int_histogram(
         data,
         bins=bins,
@@ -185,6 +185,28 @@ def make_link_histogram():
     )
 
     return plot
+
+
+def make_backlink_histogram():
+    backlinks = collections.defaultdict(int)
+    for note in zk.notes:
+        for link in note.links:
+            backlinks[link] += 1
+    data = list(backlinks.values())
+    bins = [i -0.5 for i in range(20)]
+    plot = interactive_int_histogram(
+        data,
+        bins=bins,
+        title="Backlinks per note",
+        x_axis_label="Backlinks per note",
+        x_tooltip="Backlinks per note"
+    )
+
+    return plot
+
+def depth_histogram():
+    data = zk.get_nnotes_by_depth()
+
 
 
 # todo: search with program
@@ -209,6 +231,10 @@ def search(search):
 @app.route("/lucky/<search>")
 def search_lucky(search):
     search = Path(search).stem
+    if search.startswith("."):
+        logger.debug(f"Redirecting to {search[1:]}")
+        # e.g. allows access the dashboard with .dashboard
+        return redirect(f"/{search[1:]}")
     results = zk.search(search)
     if results:
         return redirect(f"/open/{results[0].nid}")
@@ -231,6 +257,7 @@ def open(notespec: str):
     )
 
 
+@app.route("/open/")
 @app.route("/")
 def root():
     return open(zk.root)

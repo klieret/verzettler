@@ -40,6 +40,14 @@ def _get_tags(notes: Iterable[Note]) -> Set[str]:
         tags |= z.tags
     return tags
 
+@lru_cache(maxsize=100)
+def _count_tags(notes: Iterable[Note]) -> Dict[str, int]:
+    tag_counts = collections.defaultdict(int)
+    for n in notes:
+        for tag in n.tags:
+            tag_counts[tag] += 1
+    return tag_counts
+
 
 def _get_depth(g: nx.DiGraph, root, node: Any, errvalue=0):
     try:
@@ -82,6 +90,10 @@ class Zettelkasten(object):
     @property
     def tags(self) -> Set[str]:
         return _get_tags(self._nid2note.values())
+
+    @property
+    def tag_counts(self) -> Dict[str, int]:
+        return _count_tags(self._nid2note.values())
 
     @property
     def categories(self) -> Set[str]:
@@ -137,7 +149,7 @@ class Zettelkasten(object):
             root = self.root
         return {
             depth: len(nids)
-            for depth, nids in _get_notes_by_depth(g=self._graph, root=self.root).items()
+            for depth, nids in _get_notes_by_depth(g=self._graph, root=root).items()
         }
 
     def get_neighbors(self, nid, k=1):

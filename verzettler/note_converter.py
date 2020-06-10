@@ -33,14 +33,17 @@ class NoteConverter(ABC):
             outf.write(self.convert(note))
 
 
+# nodes.widthConstraint: 50,
+
 _dotgraph_html = """
-<div id="mynetwork" style="height: 500px;"></div>
+<div id="mynetwork" style="width: 100%; height: {height};"></div>
 
 <script type="text/javascript">
   let container = document.getElementById('mynetwork');
   let dot = `{dotgraph}`;
   let data = vis.parseDOTNetwork(dot);
-  let options = {}
+  let options = {
+  }
   let network = new vis.Network(container, data, options);
   network.on( 'click', function(properties) {
     let id = properties.nodes[0];
@@ -88,7 +91,7 @@ def dotgraph_html(zk, note: Note):
         )
         dotstr = zk.dot_graph(only_nodes=selected_nodes,
                                    variable_size=False)
-        out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr))
+        out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr).replace("{height}", f"{400 + 10*len(selected_nodes)}px"))
     return out_lines
 
 
