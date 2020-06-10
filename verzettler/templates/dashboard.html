@@ -16,6 +16,12 @@
           </header>
 
           <div class="post-content">
+
+            <h2>Overview table</h2>
+
+            {{ table|safe }}
+
+            <h2>Plots</h2>
             {% for script in scripts %}
                 {{ script|indent(4)|safe }}
             {% endfor %}
