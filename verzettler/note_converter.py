@@ -14,6 +14,7 @@ import networkx as nx
 from verzettler.note import Note
 from verzettler.markdown_reader import MarkdownReader
 from verzettler.log import logger
+from verzettler.dotgraphgenerator import DotGraphGenerator
 
 
 class NoteConverter(ABC):
@@ -89,8 +90,8 @@ def dotgraph_html(zk, note: Note):
         out_lines.append(
             '<script src="/static/js/vis-network.min.js"></script>\n'
         )
-        dotstr = zk.dot_graph(only_nodes=selected_nodes,
-                                   variable_size=False)
+        dgg = DotGraphGenerator(zk=zk)
+        dotstr = dgg.graph_from_notes(selected_nodes)
         out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr).replace("{height}", f"{400 + 10*len(selected_nodes)}px"))
     return out_lines
 

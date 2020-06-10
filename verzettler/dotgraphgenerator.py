@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # std
-from typing import List
+from typing import Iterable
 
 # ours
 from verzettler.note import Note
@@ -20,7 +20,7 @@ class DotGraphGenerator(object):
         ]
         self.zk = zk
 
-    def graph_from_notes(self, nids: List[str]):
+    def graph_from_notes(self, nids: Iterable[str]):
         lines = []
         lines.extend(self.prologue)
         drawn_links = []
@@ -31,7 +31,7 @@ class DotGraphGenerator(object):
                 if link not in nids:
                     continue
 
-                if link not in self:
+                if link not in self.zk:
                     logger.error(f"Didn't find note with id {link}.")
                     continue
                 if (note.nid, link) in drawn_links:
@@ -44,7 +44,7 @@ class DotGraphGenerator(object):
                     drawn_links.extend(
                         [(note.nid, link), (link, note.nid)]
                     )
-        lines.extend(self.prologue)
+        lines.extend(self.epilogue)
         return "\n".join(lines)
 
     def get_color(self, note: Note):
