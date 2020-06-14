@@ -272,6 +272,10 @@ def asset(path: str):
     return app.send_static_file(str(realpath))
 
 
-if __name__ == '__main__':
+def main():
     app.logger.setLevel(logging.DEBUG)
     app.run()
+
+
+if __name__ == '__main__':
+    main()
