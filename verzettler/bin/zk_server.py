@@ -17,7 +17,7 @@ from verzettler.zettelkasten import Zettelkasten
 from verzettler.util import get_zk_base_dirs_from_env
 from verzettler.log import logger
 from verzettler.note_converter import PandocConverter, dotgraph_html
-from verzettler.bokeh_plots import make_backlink_histogram, make_link_histogram, depth_histogram
+from verzettler.bokeh_plots import make_backlink_histogram, make_link_histogram, depth_histogram, zk_name_pie_chart
 
 
 templates = Path(__file__).resolve().parent.parent / "templates"
@@ -55,7 +55,8 @@ def dashboard():
     plots = [
         make_link_histogram(zk=zk),
         make_backlink_histogram(zk=zk),
-        depth_histogram(zk=zk)
+        depth_histogram(zk=zk),
+        zk_name_pie_chart(zk=zk)
     ]
     plots = [components(plot) for plot in plots]
     scripts, divs = list(zip(*plots))
