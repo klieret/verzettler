@@ -7,36 +7,20 @@ from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.plotting import figure
 
 
-def interactive_int_histogram(
-        data,
-        bins,
+def int_hist_from_binned_data(
+        arr_hist,
+        edges,
         title,
         x_axis_label,
-        x_tooltip
+        x_tooltip,
 ):
-    """Plot interactive histogram using bokeh.
-
-    Adapted from
-    https://gist.github.com/bhishanpdl/43f5ddad264c1a712979ddc63dd3d6ee
-
-    df: pandas dataframe
-    col: column of panda dataframe to plot (eg. age of users)
-    n_bins: number of bins, e.g. 9
-    bin_range: list with min and max value. e.g. [10,100] age of users.
-    title: title of plot. e.g. 'Airnb Users Age Distribution'
-    x_axis_label: x axis label. e.g. 'Age (years)'.
-    x_tooltip: x axis tooltip string. e.g. 'Age'
-
-    """
-    arr_hist, edges = np.histogram(data, bins=bins)
-
     # todo: do I really need pandas for this?
     # Column data source
     arr_df = pd.DataFrame({
         'count': arr_hist,
         'left': edges[:-1],
         'right': edges[1:],
-        'middle': (edges[:-1]+edges[1:])/2}
+        'middle': (edges[:-1] + edges[1:]) / 2}
     )
     arr_df['f_count'] = ['%d' % count for count in arr_df['count']]
     arr_df['f_middle'] = ['%d' % count for count in arr_df['middle']]
@@ -75,10 +59,29 @@ def interactive_int_histogram(
     p.yaxis.major_label_text_font_size = '12pt'
 
     # Add a hover tool referring to the formatted columns
-    hover = HoverTool(tooltips=[(x_tooltip, '@f_middle'),
-                                ('Count', '@f_count')])
+    hover = HoverTool(
+        tooltips=[
+            (x_tooltip, '@f_middle'),
+            ('Count', '@f_count')
+        ]
+    )
 
     # Add the hover tool to the graph
     p.add_tools(hover)
 
     return p
+
+
+def int_hist(
+        data,
+        bins,
+        **kwargs,
+):
+    """Plot interactive histogram using bokeh.
+    """
+    arr_hist, edges = np.histogram(data, bins=bins)
+    return int_hist_from_binned_data(
+        arr_hist=arr_hist,
+        edges=edges,
+        **kwargs,
+    )

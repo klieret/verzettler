@@ -5,7 +5,7 @@ import collections
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.bokeh_utils import interactive_int_histogram
+from verzettler.bokeh_utils import int_hist
 
 
 # def depth_histogram(zk: Zettelkasten):
@@ -15,7 +15,7 @@ from verzettler.bokeh_utils import interactive_int_histogram
 def make_link_histogram(zk: Zettelkasten):
     data = [len(note.links) for note in zk.notes]
     bins = [i - 0.5 for i in range(20)]
-    plot = interactive_int_histogram(
+    plot = int_hist(
         data,
         bins=bins,
         title="Links per note",
@@ -33,7 +33,7 @@ def make_backlink_histogram(zk: Zettelkasten):
             backlinks[link] += 1
     data = list(backlinks.values())
     bins = [i - 0.5 for i in range(20)]
-    plot = interactive_int_histogram(
+    plot = int_hist(
         data,
         bins=bins,
         title="Backlinks per note",
