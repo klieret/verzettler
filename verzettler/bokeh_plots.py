@@ -3,13 +3,33 @@
 # std
 import collections
 
+# 3rd
+import numpy as np
+
 # ours
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.bokeh_utils import int_hist
+from verzettler.bokeh_utils import int_hist, int_hist_from_binned_data
 
 
-# def depth_histogram(zk: Zettelkasten):
-#     data = zk.get_nnotes_by_depth()
+def depth_histogram(zk: Zettelkasten):
+    data = zk.get_nnotes_by_depth()
+    _ds = list(data.keys())
+    xs = np.arange(min(_ds), max(_ds)+1)
+    counts = np.array([
+        data[x] if x in data else 0 for x in xs
+    ])
+    edges = [i - 0.5 for i in xs]
+    edges.append(edges[-1] + 1)
+    edges = np.array(edges)
+    print(counts)
+    print(edges)
+    return int_hist_from_binned_data(
+        counts,
+        edges,
+        title="Depth",
+        x_axis_label="Depth",
+        x_tooltip="Depth"
+    )
 
 
 def make_link_histogram(zk: Zettelkasten):
