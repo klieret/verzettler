@@ -2,3 +2,7 @@ colour
 termcolor
 colorlog
 pyperclip
+bokeh
+numpy
+pandas
+tabulate
