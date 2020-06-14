@@ -252,7 +252,7 @@ class PandocConverter(NoteConverter):
             if not remove_line:
                 out_lines.append(md_line.text)
 
-        out_lines.extend(["\n\n"] + dotgraph_html(self.zk, note))
+        # out_lines.extend(["\n\n"] + dotgraph_html(self.zk, note))
 
         return "".join(out_lines)
 

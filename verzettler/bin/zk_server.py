@@ -20,7 +20,7 @@ import tabulate
 from verzettler.zettelkasten import Zettelkasten
 from verzettler.util import get_zk_base_dirs_from_env
 from verzettler.log import logger
-from verzettler.note_converter import PandocConverter
+from verzettler.note_converter import PandocConverter, dotgraph_html
 
 
 templates = Path(__file__).resolve().parent.parent / "templates"
@@ -250,10 +250,12 @@ def open(notespec: str):
     else:
         note = zk.get_by_path(notespec)
     converted = pandoc_converter.convert(note)
+    dot = "".join(dotgraph_html(zk, note))
     return render_template(
         "page.html",
         pandoc_output=converted,
-        title=note.title
+        title=note.title,
+        dot=dot,
     )
 
 
