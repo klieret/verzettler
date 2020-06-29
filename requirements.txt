@@ -6,3 +6,5 @@ bokeh
 numpy
 pandas
 tabulate
+flask
+networkx
