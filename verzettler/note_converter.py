@@ -38,7 +38,7 @@ class NoteConverter(ABC):
 # nodes.widthConstraint: 50,
 
 _dotgraph_html = """
-<div id="mynetwork" style="width: 100%; height: {height};"></div>
+<div id="mynetwork" style="width: 80%; height: {height};"></div>
 
 <script type="text/javascript">
   let container = document.getElementById('mynetwork');

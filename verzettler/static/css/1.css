@@ -454,3 +454,10 @@ a.external {
 /*a.external {*/
 /*  color: #c4a000;*/
 /*}*/
+
+.plot-container {
+  display : block;
+  margin : 0 auto;
+  text-align: left;
+  /*width: 800px;*/
+}

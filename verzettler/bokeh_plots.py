@@ -87,7 +87,8 @@ def zk_name_pie_chart(zk: Zettelkasten):
         toolbar_location=None,
         tools="hover",
         tooltips="@country: @value",
-        x_range=(-0.5, 1.0)
+        x_range=(-0.5, 1.0),
+        sizing_mode='scale_width'
     )
 
     p.wedge(
