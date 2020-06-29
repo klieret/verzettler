@@ -69,11 +69,14 @@ def _get_k_neighbors(g: nx.DiGraph, root, k=1):
         node for node in g.nodes if 1 <= _get_depth(g, root=root, node=node) <= k
     ]
 
+@lru_cache(maxsize=100)
+def _get_root(g: nx.DiGraph) -> str:
+    return min(g.nodes)
+
 
 class Zettelkasten(object):
 
     def __init__(self, zettels: Optional[List[Note]] = None):
-        self.root = "00000000000000"
         self._nid2note = {}  # type: Dict[str, Note]
         self._graph = nx.DiGraph()
         if zettels is not None:
@@ -81,6 +84,10 @@ class Zettelkasten(object):
 
     # Properties
     # =========================================================================
+
+    @property
+    def root(self):
+        return _get_root(self._graph)
 
     @property
     def notes(self):

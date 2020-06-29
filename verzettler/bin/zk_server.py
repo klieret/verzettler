@@ -24,7 +24,7 @@ templates = Path(__file__).resolve().parent.parent / "templates"
 statics = Path(__file__).resolve().parent.parent / "static"
 
 
-app = Flask(__name__, template_folder=templates, static_folder=statics)
+app = Flask(__name__, template_folder=str(templates), static_folder=str(statics))
 app.config['SECRET_KEY'] = 'asfnfl1232#'
 
 # https://stackoverflow.com/questions/9508667/reload-flask-app-when-template-file-changes
