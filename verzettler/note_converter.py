@@ -7,6 +7,7 @@ from pathlib import PurePath, Path
 import random
 import subprocess
 import collections
+import re
 
 # 3rd
 import networkx as nx
@@ -16,6 +17,7 @@ from verzettler.note import Note
 from verzettler.markdown_reader import MarkdownReader
 from verzettler.log import logger
 from verzettler.dotgraphgenerator import DotGraphGenerator
+from verzettler.util.regex import find_urls
 
 
 class NoteConverter(ABC):
@@ -249,6 +251,9 @@ class PandocConverter(NoteConverter):
                 except KeyError:
                     logger.error(f"Couldn't find note {nid}")
 
+            for url in find_urls(md_line.text):
+                if not re.findall(f"[.*]({url})", md_line.text):
+                    md_line.text = md_line.text.replace(url, f"[{url}]({url})")
             # todo: Add hyperrefs for normal weblinks, using this regex:
             # https://www.geeksforgeeks.org/python-check-url-string/
 
