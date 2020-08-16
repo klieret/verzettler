@@ -22,21 +22,19 @@ def add_id(path: PurePath) -> PurePath:
             name = path.name + zid + ".md"
         return path.parent / name
     elif zid == "many":
-        logger.critical(f"Already found MULTIPLE ids in {path}. "
-                        f"Leaving unchanged")
+        logger.critical(
+            f"Already found MULTIPLE ids in {path}. " f"Leaving unchanged"
+        )
         return path
     else:
-        logger.warning(f"Already found ID in {path}. "
-                       f"Leaving unchanged.")
+        logger.warning(f"Already found ID in {path}. " f"Leaving unchanged.")
 
 
 def cli():
     parser = argparse.ArgumentParser()
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
-    parser.add_argument(
-        dest="file",
-    )
+    parser.add_argument(dest="file",)
     args = parser.parse_args()
     new_path = add_id(args.file)
     shutil.move(args.file, str(new_path))

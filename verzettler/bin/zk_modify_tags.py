@@ -12,18 +12,10 @@ from verzettler.cli_util import init_zk_from_cli
 def cli():
     def add_additional_argparse_arguments(parser: argparse.ArgumentParser):
         parser.add_argument(
-            "-r",
-            "--remove",
-            nargs="+",
-            help="Remove tags",
-            default=set(),
+            "-r", "--remove", nargs="+", help="Remove tags", default=set(),
         )
         parser.add_argument(
-            "-a",
-            "--add",
-            nargs="+",
-            help="Add tags",
-            default=set(),
+            "-a", "--add", nargs="+", help="Add tags", default=set(),
         )
         parser.add_argument(
             "-n",

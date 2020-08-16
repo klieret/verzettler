@@ -18,7 +18,9 @@ class Note(object):
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
     markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
-    external_link_regex = re.compile(r"\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)")
+    external_link_regex = re.compile(
+        r"\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)"
+    )
     section_regex = re.compile(r"(#+)\s+(.+)")
 
     def __init__(self, path: Path):
@@ -55,9 +57,7 @@ class Note(object):
     # =========================================================================
 
     def _read_tags(self, line: str) -> Set[str]:
-        return set(
-            t[1:] for t in set(self.tag_regex.findall(line))
-        )
+        return set(t[1:] for t in set(self.tag_regex.findall(line)))
 
     # Analyze file
     # =========================================================================
@@ -71,12 +71,18 @@ class Note(object):
                 if self.title and self.title != md_line.current_section[0]:
                     logger.warning(f"{self.path} Warning: Multiple titles. ")
                 self.title = md_line.current_section[0]
-            if not md_line.is_code_block and md_line.text.lower().strip().startswith("tags: "):
+            if not md_line.is_code_block and md_line.text.lower().strip().startswith(
+                "tags: "
+            ):
                 if self.tags:
-                    logger.warning(f"{self.path} Warning: Tags were already set.")
+                    logger.warning(
+                        f"{self.path} Warning: Tags were already set."
+                    )
                 self.tags = self._read_tags(md_line.text)
-            if len(md_line.current_section) >= 2 and \
-                    md_line.current_section[1].lower().strip() == "backlinks":
+            if (
+                len(md_line.current_section) >= 2
+                and md_line.current_section[1].lower().strip() == "backlinks"
+            ):
                 pass
             else:
                 self.links.extend(self.id_link_regex.findall(md_line.text))

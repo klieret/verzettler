@@ -15,25 +15,17 @@ class TestNote(TestCase):
         self.playground = Path(__file__).resolve().parent / "playground"
 
     def _test_regex_findall_dict(
-            self,
-            regex: re.Pattern,
-            dct: Dict[str, List[str]]
+        self, regex: re.Pattern, dct: Dict[str, List[str]]
     ):
         for test, matches in dct.items():
             with self.subTest(test=test):
-                self.assertEqual(
-                    matches,
-                    regex.findall(test)
-                )
+                self.assertEqual(matches, regex.findall(test))
 
     def _test_regex_findall_single_match_dict(
-            self,
-            regex: re.Pattern,
-            dct: Dict[str, str]
+        self, regex: re.Pattern, dct: Dict[str, str]
     ):
         return self._test_regex_findall_dict(
-            regex=regex,
-            dct={key: [value] for key, value in dct.items()}
+            regex=regex, dct={key: [value] for key, value in dct.items()}
         )
 
     def test_id_regex(self):
@@ -56,13 +48,14 @@ class TestNote(TestCase):
     def test_external_link_regex(self):
         dct = {
             '[a](asdf.md "autogen")': [],
-            '[a](asdf.md)': [],
-            '[a](https://a/b/c/x.html)': [("a", "https://a/b/c/x.html")],
-            '[a](https://a/b/c/x.html "something")': [("a", 'https://a/b/c/x.html "something"')],
+            "[a](asdf.md)": [],
+            "[a](https://a/b/c/x.html)": [("a", "https://a/b/c/x.html")],
+            '[a](https://a/b/c/x.html "something")': [
+                ("a", 'https://a/b/c/x.html "something"')
+            ],
             '[Master](../../szettel/mds/master_00000000000000.md "autogen")': [],
         }
         self._test_regex_findall_dict(Note.external_link_regex, dct)
-
 
     def get_note_by_fname(self, fname):
         return Note(self.playground / fname)
@@ -71,9 +64,7 @@ class TestNote(TestCase):
         n = self.get_note_by_fname("00000000000000_zid.md")
         print(n, n.nid)
         print("------------ here")
-        self.assertEqual(
-            "00000000000000", n.nid
-        )
+        self.assertEqual("00000000000000", n.nid)
 
     def test_get_links(self):
         n = self.get_note_by_fname("00000000000002_links_01.md")
@@ -84,14 +75,8 @@ class TestNote(TestCase):
 
     def test_get_tags(self):
         n = self.get_note_by_fname("00000000000001_tags.md")
-        self.assertEqual(
-            {"tag1", "tag2"},
-            set(n.tags)
-        )
+        self.assertEqual({"tag1", "tag2"}, set(n.tags))
 
     def test_get_title(self):
         n = self.get_note_by_fname("00000000000006_title.md")
-        self.assertEqual(
-            "This is a title",
-            n.title
-        )
+        self.assertEqual("This is a title", n.title)

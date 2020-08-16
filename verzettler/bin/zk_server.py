@@ -17,18 +17,25 @@ from verzettler.zettelkasten import Zettelkasten
 from verzettler.util.paths import get_zk_base_dirs_from_env
 from verzettler.log import logger
 from verzettler.note_converter import PandocConverter, dotgraph_html
-from verzettler.bokeh_plots import make_backlink_histogram, make_link_histogram, depth_histogram, zk_name_pie_chart
+from verzettler.bokeh_plots import (
+    make_backlink_histogram,
+    make_link_histogram,
+    depth_histogram,
+    zk_name_pie_chart,
+)
 
 
 templates = Path(__file__).resolve().parent.parent / "templates"
 statics = Path(__file__).resolve().parent.parent / "static"
 
 
-app = Flask(__name__, template_folder=str(templates), static_folder=str(statics))
-app.config['SECRET_KEY'] = 'asfnfl1232#'
+app = Flask(
+    __name__, template_folder=str(templates), static_folder=str(statics)
+)
+app.config["SECRET_KEY"] = "asfnfl1232#"
 
 # https://stackoverflow.com/questions/9508667/reload-flask-app-when-template-file-changes
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 zk = Zettelkasten()
 for d in get_zk_base_dirs_from_env():
@@ -56,7 +63,7 @@ def dashboard():
         make_link_histogram(zk=zk),
         make_backlink_histogram(zk=zk),
         depth_histogram(zk=zk),
-        zk_name_pie_chart(zk=zk)
+        zk_name_pie_chart(zk=zk),
     ]
     plots = [components(plot) for plot in plots]
     scripts, divs = list(zip(*plots))
@@ -70,17 +77,17 @@ def dashboard():
         (f"Links/note", f"{zk._graph.size()/len(zk._nid2note):.2f}"),
         (f"Number of tags", f"{len(zk.tags)}"),
         (f"Number of orphans", f"{len(zk.get_orphans())} "),
-        (f"Maximum depth", f"{max_depth}")
+        (f"Maximum depth", f"{max_depth}"),
     ]
     table = tabulate.tabulate(table_data, tablefmt="html")
 
     return render_template(
-        'dashboard.html',
+        "dashboard.html",
         scripts=scripts,
         divs=divs,
         js_resources=js_resources,
         css_resources=css_resources,
-        table=table
+        table=table,
     )
 
 
@@ -127,10 +134,7 @@ def open(notespec: str):
     converted = pandoc_converter.convert(note)
     dot = "".join(dotgraph_html(zk, note))
     return render_template(
-        "page.html",
-        pandoc_output=converted,
-        title=note.title,
-        dot=dot,
+        "page.html", pandoc_output=converted, title=note.title, dot=dot,
     )
 
 
@@ -152,5 +156,5 @@ def main():
     app.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

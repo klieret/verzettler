@@ -36,7 +36,8 @@ def guess_zk_dir(inpt: Union[str, PurePath]) -> Optional[Path]:
         elif len(results) == 1:
             logger.debug(
                 f"Guessed zk directory from search term {inpt} to be "
-                f"{results[0]}.")
+                f"{results[0]}."
+            )
             return Path(results[0])
         else:
             logger.warning("Too many results for zk directory.")
@@ -50,12 +51,11 @@ def cli():
         "-d",
         "--dir",
         help="Path to zettelkasten directory or. Search term for zettelkasten"
-             " directory (e.g. part of path).",
-        required=False
+        " directory (e.g. part of path).",
+        required=False,
     )
     parser.add_argument(
-        dest="name",
-        help="Name",
+        dest="name", help="Name",
     )
     add_action_option(parser)
     args = parser.parse_args()

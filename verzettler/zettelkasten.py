@@ -38,6 +38,7 @@ def _get_tags(notes: Iterable[Note]) -> Set[str]:
         tags |= z.tags
     return tags
 
+
 @lru_cache(maxsize=100)
 def _count_tags(notes: Iterable[Note]) -> Dict[str, int]:
     tag_counts = collections.defaultdict(int)
@@ -65,8 +66,11 @@ def _get_notes_by_depth(g: nx.DiGraph, root) -> Dict[int, Set[Any]]:
 @lru_cache(maxsize=1000)
 def _get_k_neighbors(g: nx.DiGraph, root, k=1):
     return [
-        node for node in g.nodes if 1 <= _get_depth(g, root=root, node=node) <= k
+        node
+        for node in g.nodes
+        if 1 <= _get_depth(g, root=root, node=node) <= k
     ]
+
 
 @lru_cache(maxsize=100)
 def _get_root(g: nx.DiGraph) -> str:
@@ -74,7 +78,6 @@ def _get_root(g: nx.DiGraph) -> str:
 
 
 class Zettelkasten(object):
-
     def __init__(self, zettels: Optional[List[Note]] = None):
         self._nid2note = {}  # type: Dict[str, Note]
         self._graph = nx.DiGraph()
@@ -129,7 +132,8 @@ class Zettelkasten(object):
 
     def get_orphans(self) -> Set[Note]:
         return set(
-            self[nid] for nid in _get_orphans(self._graph)
+            self[nid]
+            for nid in _get_orphans(self._graph)
             if not nid == self.root
         )
 
@@ -146,7 +150,9 @@ class Zettelkasten(object):
             root = self.root
         return {
             depth: self._nids2notes(nids)
-            for depth, nids in _get_notes_by_depth(g=self._graph, root=root).items()
+            for depth, nids in _get_notes_by_depth(
+                g=self._graph, root=root
+            ).items()
         }
 
     def get_nnotes_by_depth(self, root=None):
@@ -154,7 +160,9 @@ class Zettelkasten(object):
             root = self.root
         return {
             depth: len(nids)
-            for depth, nids in _get_notes_by_depth(g=self._graph, root=root).items()
+            for depth, nids in _get_notes_by_depth(
+                g=self._graph, root=root
+            ).items()
         }
 
     def get_neighbors(self, nid, k=1):
@@ -193,28 +201,43 @@ class Zettelkasten(object):
         if set(search) & {"*", "^", "$"}:
             name_search_regexp = re.compile(n_search)
             title_search_regexp = re.compile(t_search)
-            return remove_duplicates([
-                note for note in self.notes
-                if name_search_regexp.match(note.path.name) or
-                   title_search_regexp.match(note.title)
-            ])
+            return remove_duplicates(
+                [
+                    note
+                    for note in self.notes
+                    if name_search_regexp.match(note.path.name)
+                    or title_search_regexp.match(note.title)
+                ]
+            )
 
         # Keep the order
         results = []
-        results.extend([
-            note for note in self.notes
-            if Note.id_regex.sub("", note.path.stem).replace("_", " ").strip() == t_search or
-               note.title == t_search
-        ])
-        results.extend([
-            note for note in self.notes
-            if note.path.stem.startswith(n_search)
-               or note.title.startswith(t_search)
-        ])
-        results.extend([
-            note for note in self.notes
-            if n_search in note.path.stem or t_search in note.title
-        ])
+        results.extend(
+            [
+                note
+                for note in self.notes
+                if Note.id_regex.sub("", note.path.stem)
+                .replace("_", " ")
+                .strip()
+                == t_search
+                or note.title == t_search
+            ]
+        )
+        results.extend(
+            [
+                note
+                for note in self.notes
+                if note.path.stem.startswith(n_search)
+                or note.title.startswith(t_search)
+            ]
+        )
+        results.extend(
+            [
+                note
+                for note in self.notes
+                if n_search in note.path.stem or t_search in note.title
+            ]
+        )
 
         print([r.path.name for r in remove_duplicates(results)])
 
@@ -231,10 +254,7 @@ class Zettelkasten(object):
             for link in note.links:
                 self._graph.add_edge(note.nid, link)
 
-    def add_notes_from_directory(
-            self,
-            directory: Union[PurePath, str]
-    ) -> None:
+    def add_notes_from_directory(self, directory: Union[PurePath, str]) -> None:
         directory = Path(directory)
         for root, dirs, files in os.walk(str(directory), topdown=True):
             dirs[:] = [d for d in dirs if d not in [".git"]]
@@ -259,14 +279,12 @@ class Zettelkasten(object):
             f"Number of notes: {len(self._nid2note)}",
             f"Number of tags: {len(self.tags)}",
             f"Number of orphans: {len(self.get_orphans())} ",
-            f"Number of links: {self._graph.size()}"
+            f"Number of links: {self._graph.size()}",
         ]
         return "\n".join(lines)
 
     def apply_converter(
-            self,
-            converter: NoteConverter,
-            output_basedir: Union[str, PurePath]
+        self, converter: NoteConverter, output_basedir: Union[str, PurePath]
     ):
         """ Apply converter to all notes in Zettelkasten. The target path for
         each note will be output_basedir/filename.
@@ -283,7 +301,6 @@ class Zettelkasten(object):
         for note in self.notes:
             new_path = output_basedir / note.path.name
             converter.convert_write(note, path=new_path)
-
 
     # Magic
     # =========================================================================

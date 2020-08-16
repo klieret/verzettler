@@ -13,11 +13,9 @@ class DotGraphGenerator(object):
         self.prologue = [
             "digraph zettelkasten {",
             "\tnode [shape=box];"
-            "\tedge [splits=true];"  # todo: not working yet
+            "\tedge [splits=true];",  # todo: not working yet
         ]
-        self.epilogue = [
-            "}"
-        ]
+        self.epilogue = ["}"]
         self.zk = zk
 
     def graph_from_notes(self, nids: Iterable[str]):
@@ -40,10 +38,10 @@ class DotGraphGenerator(object):
                     lines.append(f'\t{note.nid} -> {link} [color="black"];')
                     drawn_links.append((note.nid, link))
                 else:
-                    lines.append(f'\t{note.nid} -> {link} [color="black" dir="both"];')
-                    drawn_links.extend(
-                        [(note.nid, link), (link, note.nid)]
+                    lines.append(
+                        f'\t{note.nid} -> {link} [color="black" dir="both"];'
                     )
+                    drawn_links.extend([(note.nid, link), (link, note.nid)])
         lines.extend(self.epilogue)
         return "\n".join(lines)
 
@@ -54,9 +52,11 @@ class DotGraphGenerator(object):
         return 14
 
     def format_note(self, note: Note):
-        return f'\t{note.nid} [' \
-            f'label="{note.title}" ' \
-            f'labelURL="http://127.0.0.1:5000/open/{note.nid}" ' \
-            f'color="{self.get_color(note)}"' \
-            f'fontsize={self.get_fontsize(note)}' \
-            f'];'
+        return (
+            f"\t{note.nid} ["
+            f'label="{note.title}" '
+            f'labelURL="http://127.0.0.1:5000/open/{note.nid}" '
+            f'color="{self.get_color(note)}"'
+            f"fontsize={self.get_fontsize(note)}"
+            f"];"
+        )

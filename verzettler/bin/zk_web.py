@@ -12,7 +12,9 @@ from verzettler.log import logger
 
 
 def format_dot_html(dot_str: str) -> str:
-    html_resource_dir = Path(__file__).parent.resolve().parent / "html_resources"
+    html_resource_dir = (
+        Path(__file__).parent.resolve().parent / "html_resources"
+    )
     js_path = html_resource_dir / "vis-network.min.js"
     html_path = html_resource_dir / "dot.html"
     dot_str = dot_str.replace("'", "\\'")
@@ -34,24 +36,22 @@ def _output_dot(zk: Zettelkasten, path: Path) -> None:
         outf.write(zk.dot_graph())
 
 
-output_format_to_converter = {
-    ".html": _output_html,
-    ".dot": _output_dot
-}
+output_format_to_converter = {".html": _output_html, ".dot": _output_dot}
 
 
 def cli():
-
     def add_additional_arguments(parser: argparse.ArgumentParser):
         parser.add_argument(
             "-o",
             "--output",
             help=f"Output file. The following file formats are "
-                 f"supported: {', '.join(output_format_to_converter.keys())}.",
-            default="out.html"
+            f"supported: {', '.join(output_format_to_converter.keys())}.",
+            default="out.html",
         )
 
-    zk, args = init_zk_from_cli(additional_argparse_setup=add_additional_arguments)
+    zk, args = init_zk_from_cli(
+        additional_argparse_setup=add_additional_arguments
+    )
     args.output = Path(args.output)
     try:
         output_format_to_converter[args.output.suffix](zk, args.output)

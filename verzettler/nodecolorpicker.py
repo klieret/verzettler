@@ -13,18 +13,14 @@ from verzettler.zettelkasten import Zettelkasten
 
 
 class NodeColorPicker(ABC):
-
     @abstractmethod
     def __call__(self, note: Note):
         pass
 
 
 class CategoryNodeColorPicker(NodeColorPicker):
-
     def __init__(
-            self,
-            zettelkasten: Zettelkasten,
-            colors: Optional[List[str]] = None
+        self, zettelkasten: Zettelkasten, colors: Optional[List[str]] = None
     ):
 
         self.zettelkasten = zettelkasten
@@ -59,12 +55,11 @@ class CategoryNodeColorPicker(NodeColorPicker):
 
 
 class DepthNodeColorPicker(NodeColorPicker):
-
     def __init__(
-            self,
-            zettelkasten: Zettelkasten,
-            start_color="#f67280",
-            end_color="#fff7f8"
+        self,
+        zettelkasten: Zettelkasten,
+        start_color="#f67280",
+        end_color="#fff7f8",
     ):
         self.colors = list(
             Color(start_color).range_to(Color(end_color), zettelkasten.depth)

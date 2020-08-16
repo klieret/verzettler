@@ -47,18 +47,17 @@ class DefaultTransformer(NoteTransformer):
         >>> DefaultTransformer._format_tags(["tag1", "tag2"]).strip()
         'Tags: #tag1 #tag2'
         """
-        return "Tags: " + " ".join(
-            "#" + tag for tag in sorted(list(tags))) + "\n"
+        return (
+            "Tags: " + " ".join("#" + tag for tag in sorted(list(tags))) + "\n"
+        )
 
     def _format_link(self, note: Note, zid: str) -> str:
         if zid in self.zk:
             rel_path = Path(
-                os.path.relpath(
-                    str(self.zk[zid].path),
-                    str(note.path.parent))
+                os.path.relpath(str(self.zk[zid].path), str(note.path.parent))
             )
             link_title = self.zk[zid].title
-            return f"[[{zid}]] [{link_title}]({rel_path} \"autogen\")"
+            return f'[[{zid}]] [{link_title}]({rel_path} "autogen")'
         else:
             return f"[[{zid}]]"
 
@@ -76,23 +75,35 @@ class DefaultTransformer(NoteTransformer):
                 continue
 
             # Change style of headers
-            if i > 1 and not md_line.is_code_block and md_line.text.startswith("===") and md_reader.lines[i-1].text.strip():
+            if (
+                i > 1
+                and not md_line.is_code_block
+                and md_line.text.startswith("===")
+                and md_reader.lines[i - 1].text.strip()
+            ):
                 out_lines = out_lines[:-1]
                 md_line.text = "# " + md_reader.lines[i - 1].text
-            if i > 1 and not md_line.is_code_block and md_line.text.startswith("---") and md_reader.lines[i-1].text.strip():
+            if (
+                i > 1
+                and not md_line.is_code_block
+                and md_line.text.startswith("---")
+                and md_reader.lines[i - 1].text.strip()
+            ):
                 out_lines = out_lines[:-1]
                 md_line.text = "## " + md_reader.lines[i - 1].text
 
             # Modifying tags if haven't been given before
             if not note.tags:
-                if i >= 1 and md_reader.lines[i - 1].text.startswith("# ") \
-                        and not md_line.is_code_block:
+                if (
+                    i >= 1
+                    and md_reader.lines[i - 1].text.startswith("# ")
+                    and not md_line.is_code_block
+                ):
                     tags = self.tag_transformer(set())
                     if tags:
-                        out_lines.extend([
-                            "\n",
-                            self._format_tags(tags),
-                        ])
+                        out_lines.extend(
+                            ["\n", self._format_tags(tags),]
+                        )
 
             # Modifying tags if already given
             if "tags: " in md_line.text.lower() and not md_line.is_code_block:
@@ -117,8 +128,10 @@ class DefaultTransformer(NoteTransformer):
                 md_line.text = md_line.text.replace(link, new_links)
 
             # Remove old backlinks section
-            if len(md_line.current_section) == 2 and \
-                    md_line.current_section[-1].lower() == "backlinks":
+            if (
+                len(md_line.current_section) == 2
+                and md_line.current_section[-1].lower() == "backlinks"
+            ):
                 remove_line = True
 
             # Add lines
@@ -133,10 +146,14 @@ class DefaultTransformer(NoteTransformer):
                         pass
                     elif len(out_lines) >= 1 and out_lines[-1].endswith("\n"):
                         out_lines.extend(["\n"])
-                    elif len(out_lines) >= 1 and not out_lines[-1].endswith("\n"):
+                    elif len(out_lines) >= 1 and not out_lines[-1].endswith(
+                        "\n"
+                    ):
                         out_lines.extend(["\n", "\n"])
                     out_lines.extend(["## Backlinks\n", "\n"])
                     for backlink in sorted(list(backlinks)):
-                        out_lines.append(f"* {self._format_link(note, backlink)}\n")
+                        out_lines.append(
+                            f"* {self._format_link(note, backlink)}\n"
+                        )
 
         return "".join(out_lines)

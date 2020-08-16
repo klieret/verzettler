@@ -8,12 +8,7 @@ import re
 
 class MarkdownLine(object):
     def __init__(
-            self,
-            text,
-            is_code_block,
-            current_section,
-            is_last_line,
-
+        self, text, is_code_block, current_section, is_last_line,
     ):
         self.text = text
         self.is_code_block = is_code_block
@@ -51,14 +46,18 @@ class MarkdownReader(object):
                 current_section.append(text)
 
             # Underline headings
-            if not is_last_line and \
-                set(lines[i+1]) == {"="} and \
-                    len(lines[i+1]) >= 3:
+            if (
+                not is_last_line
+                and set(lines[i + 1]) == {"="}
+                and len(lines[i + 1]) >= 3
+            ):
                 current_section = [line]
-            elif not is_last_line and \
-                set(lines[i + 1]) == {"-"} and \
-                    len(lines[i + 1]) >= 3 and \
-                    len(current_section) >= 1:
+            elif (
+                not is_last_line
+                and set(lines[i + 1]) == {"-"}
+                and len(lines[i + 1]) >= 3
+                and len(current_section) >= 1
+            ):
                 current_section = [current_section[0], line]
 
             md_lines.append(
@@ -79,4 +78,3 @@ class MarkdownReader(object):
 
     def __iter__(self):
         return iter(self.lines)
-

@@ -56,6 +56,7 @@ _dotgraph_html = """
 </script>
 """
 
+
 def dotgraph_html(zk, note: Note):
     # nbd = self.zk.get_notes_by_depth(root=note.nid)
     # maxdepth = min(2, len(nbd))
@@ -75,7 +76,9 @@ def dotgraph_html(zk, note: Note):
     predecessors = set(zk._graph.predecessors(note.nid))
     categories["predecessors"] |= predecessors
     selected_nodes |= predecessors
-    descendants = set(nx.descendants_at_distance(zk._graph, note.nid, distance=1))
+    descendants = set(
+        nx.descendants_at_distance(zk._graph, note.nid, distance=1)
+    )
     categories["descendants"] |= descendants
     selected_nodes |= descendants
     optional_nodes = set()
@@ -91,10 +94,12 @@ def dotgraph_html(zk, note: Note):
         optional_nodes |= sibl
     optional_nodes -= selected_nodes
     if len(selected_nodes) < 30:
-        selected_nodes |= set(random.choices(
-            list(optional_nodes),
-            k=min(len(optional_nodes), 30 - len(selected_nodes))
-        ))
+        selected_nodes |= set(
+            random.choices(
+                list(optional_nodes),
+                k=min(len(optional_nodes), 30 - len(selected_nodes)),
+            )
+        )
 
     def pick_color(note: Note):
         nid = note.nid
@@ -124,13 +129,17 @@ def dotgraph_html(zk, note: Note):
         dgg = DotGraphGenerator(zk=zk)
         dgg.get_color = pick_color
         dotstr = dgg.graph_from_notes(selected_nodes)
-        out_lines.append(_dotgraph_html.replace("{dotgraph}", dotstr).replace("{height}", f"{400 + 10*len(selected_nodes)}px"))
+        out_lines.append(
+            _dotgraph_html.replace("{dotgraph}", dotstr).replace(
+                "{height}", f"{400 + 10*len(selected_nodes)}px"
+            )
+        )
     return out_lines
 
 
 class JekyllConverter(NoteConverter):
 
-    #.replace("'", "\\'").replace("\n", "' + \n'")
+    # .replace("'", "\\'").replace("\n", "' + \n'")
 
     def __init__(self, zk):
         self.zk = zk
@@ -139,10 +148,9 @@ class JekyllConverter(NoteConverter):
         out_lines = [
             "---\n",
             "layout: page\n",
-            f"title: \"{note.title}\"\n",
+            f'title: "{note.title}"\n',
             "exclude: true\n",  # do not add to menu
-            f"tags: {list(note.tags)}\n"
-            "---\n",
+            f"tags: {list(note.tags)}\n" "---\n",
         ]
 
         md_reader = MarkdownReader.from_file(note.path)
@@ -167,15 +175,11 @@ class JekyllConverter(NoteConverter):
 
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
-                r"[!\1](\2)",
-                md_line.text
+                r"[!\1](\2)", md_line.text
             )
 
             # Remove old markdown links
-            md_line.text = note.autogen_link_regex.sub(
-                "",
-                md_line.text,
-            )
+            md_line.text = note.autogen_link_regex.sub("", md_line.text,)
 
             # Replace raw zids, leave only links
             nids = note.id_link_regex.findall(md_line.text)
@@ -183,22 +187,21 @@ class JekyllConverter(NoteConverter):
                 try:
                     n = self.zk[nid]
                     title = n.title
-                    md_line.text = md_line.text.replace(f"[[{nid}]]", f"[{title}](/open/{nid})")
+                    md_line.text = md_line.text.replace(
+                        f"[[{nid}]]", f"[{title}](/open/{nid})"
+                    )
                 except KeyError:
                     logger.error(f"Couldn't find note {nid}")
-
 
             if not remove_line:
                 out_lines.append(md_line.text)
 
-        
         out_lines.extend(dotgraph_html(self.zk, note))
-        
+
         return "".join(out_lines)
 
 
 class PandocConverter(NoteConverter):
-
     def __init__(self, zk, self_contained=True):
         """
 
@@ -228,15 +231,11 @@ class PandocConverter(NoteConverter):
 
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
-                r'<a href="\2" class="external">\1</a>',
-                md_line.text
+                r'<a href="\2" class="external">\1</a>', md_line.text
             )
 
             # Remove old markdown links
-            md_line.text = note.autogen_link_regex.sub(
-                "",
-                md_line.text,
-            )
+            md_line.text = note.autogen_link_regex.sub("", md_line.text,)
 
             # Replace raw zids, leave only links
             nids = note.id_link_regex.findall(md_line.text)
@@ -244,8 +243,9 @@ class PandocConverter(NoteConverter):
                 try:
                     n = self.zk[nid]
                     title = n.title
-                    md_line.text = md_line.text.replace(f"[[{nid}]]",
-                                                        f"[{title}](/open/{nid})")
+                    md_line.text = md_line.text.replace(
+                        f"[[{nid}]]", f"[{title}](/open/{nid})"
+                    )
                 except KeyError:
                     logger.error(f"Couldn't find note {nid}")
 
@@ -269,18 +269,20 @@ class PandocConverter(NoteConverter):
             "--highlight-style=pygments",
         ]
         if self.self_contained:
-            cmd_parts.extend([
-                "--self-contained",
-                f"--css={css_path}",
-                "--metadata",
-                f"pagetitle=\"{note.title}\"",
-            ])
+            cmd_parts.extend(
+                [
+                    "--self-contained",
+                    f"--css={css_path}",
+                    "--metadata",
+                    f'pagetitle="{note.title}"',
+                ]
+            )
         try:
             ret = subprocess.run(
                 cmd_parts,
                 capture_output=True,
                 universal_newlines=True,
-                input=self.preproc_markdown(note=note)
+                input=self.preproc_markdown(note=note),
             )
         except subprocess.CalledProcessError:
             raise

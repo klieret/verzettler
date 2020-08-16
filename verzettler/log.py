@@ -7,8 +7,9 @@ import logging
 import colorlog
 
 
-def get_logger(name="Logger", level=logging.DEBUG, sh_level=logging.DEBUG) -> \
-        logging.Logger:
+def get_logger(
+    name="Logger", level=logging.DEBUG, sh_level=logging.DEBUG
+) -> logging.Logger:
     """Sets up a logging.Logger.
 
     If the colorlog module is available, the logger will use colors,
@@ -42,8 +43,7 @@ def get_logger(name="Logger", level=logging.DEBUG, sh_level=logging.DEBUG) -> \
         "CRITICAL": "red",
     }
     formatter = colorlog.ColoredFormatter(
-        "%(log_color)s%(levelname)s: %(message)s",
-        log_colors=log_colors,
+        "%(log_color)s%(levelname)s: %(message)s", log_colors=log_colors,
     )
     sh.setFormatter(formatter)
     sh.setLevel(sh_level)

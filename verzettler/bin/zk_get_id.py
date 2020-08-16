@@ -41,10 +41,7 @@ def cli():
     parser = argparse.ArgumentParser()
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
-    parser.add_argument(
-        dest="strings",
-        nargs="+"
-    )
+    parser.add_argument(dest="strings", nargs="+")
     args = parser.parse_args()
     cli_util.default_arg_handling(args)
     printl(get_ids(args.strings))

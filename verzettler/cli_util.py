@@ -22,7 +22,7 @@ def add_debug_args(parser: argparse.ArgumentParser) -> None:
         "-l",
         "--log",
         help="Level of the log: 'd' (debug), 'i' (info), 'w' (warning), "
-             "'e' (error), 'c' (critical).",
+        "'e' (error), 'c' (critical).",
         default="i",
         choices=list("diwec"),
     )
@@ -34,7 +34,7 @@ def add_zk_dirs_arg(parser: argparse.ArgumentParser) -> None:
         "--input",
         nargs="+",
         help="Input directories of the zettelkastens. If left blank, will try"
-             " to set from ZK_HOME environment variable. "
+        " to set from ZK_HOME environment variable. ",
     )
 
 
@@ -63,9 +63,11 @@ def default_arg_handling(args: argparse.Namespace) -> None:
             sys.exit(111)
 
 
-def init_zk_from_cli(additional_argparse_setup: Callable = pass_fct) \
-        -> Tuple["Zettelkasten", argparse.Namespace]:
+def init_zk_from_cli(
+    additional_argparse_setup: Callable = pass_fct,
+) -> Tuple["Zettelkasten", argparse.Namespace]:
     from verzettler.zettelkasten import Zettelkasten
+
     parser = argparse.ArgumentParser()
     add_zk_dirs_arg(parser)
     add_debug_args(parser)
@@ -100,9 +102,7 @@ def set_path_autocompleter(results: List[PurePath]) -> None:
 
 
 def get_path_selection(
-        results: List[PurePath],
-        search: Optional[str] = None,
-        lucky=False,
+    results: List[PurePath], search: Optional[str] = None, lucky=False,
 ) -> Optional[PurePath]:
     """ Given a list of search results for paths to notes, let the user pick
     the one he wants
@@ -120,11 +120,10 @@ def get_path_selection(
     # We're partial to search results that start with the search string,
     # so let's show them first.
     results = sorted(
-        [r for r in results if r.name.startswith(search)],
-        key=lambda p: p.name
+        [r for r in results if r.name.startswith(search)], key=lambda p: p.name
     ) + sorted(
         [r for r in results if not r.name.startswith(search)],
-        key=lambda p: p.name
+        key=lambda p: p.name,
     )
 
     if not results:
@@ -143,7 +142,11 @@ def get_path_selection(
         selection = input(colored("Your selection: ", attrs=["bold"]))
     except KeyboardInterrupt:
         return None
-    if selection.isnumeric() or selection.startswith("-") and selection[1:].isnumeric():
+    if (
+        selection.isnumeric()
+        or selection.startswith("-")
+        and selection[1:].isnumeric()
+    ):
         return results[int(selection)]
     elif selection == "":
         # Return the first one:
@@ -155,7 +158,7 @@ def get_path_selection(
                 colored(
                     "Your selection was not unique. Go again!",
                     "red",
-                    attrs=["bold"]
+                    attrs=["bold"],
                 )
             )
             return get_path_selection(results)
