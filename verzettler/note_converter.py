@@ -47,6 +47,7 @@ _dotgraph_html = """
   let dot = `{dotgraph}`;
   let data = vis.parseDOTNetwork(dot);
   let options = {
+    clickToUse: true,
   }
   let network = new vis.Network(container, data, options);
   network.on( 'click', function(properties) {
