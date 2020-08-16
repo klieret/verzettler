@@ -232,6 +232,15 @@ class PandocConverter(NoteConverter):
                     # Already set the title with meta info
                     remove_line = True
 
+            for url in find_urls(md_line.text):
+                print(
+                    url,
+                    md_line.text,
+                    re.findall(fr"\[.*\]\({url}\)", md_line.text),
+                )
+                if not re.findall(fr"\[.*\]\({url}\)", md_line.text):
+                    md_line.text = md_line.text.replace(url, f"[{url}]({url})")
+
             # Mark external links with a '*'
             md_line.text = note.external_link_regex.sub(
                 r'<a href="\2" class="external">\1</a>', md_line.text
@@ -251,12 +260,6 @@ class PandocConverter(NoteConverter):
                     )
                 except KeyError:
                     logger.error(f"Couldn't find note {nid}")
-
-            for url in find_urls(md_line.text):
-                if not re.findall(f"[.*]({url})", md_line.text):
-                    md_line.text = md_line.text.replace(url, f"[{url}]({url})")
-            # todo: Add hyperrefs for normal weblinks, using this regex:
-            # https://www.geeksforgeeks.org/python-check-url-string/
 
             if not remove_line:
                 out_lines.append(md_line.text)
