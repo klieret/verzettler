@@ -40,7 +40,7 @@ class NoteConverter(ABC):
 # nodes.widthConstraint: 50,
 
 _dotgraph_html = """
-<div id="mynetwork" style="width: 80%; height: {height};"></div>
+<div id="mynetwork" style="width: 100%; height: {height};"></div>
 
 <script type="text/javascript">
   let container = document.getElementById('mynetwork');
@@ -134,7 +134,7 @@ def dotgraph_html(zk, note: Note):
         dotstr = dgg.graph_from_notes(selected_nodes)
         out_lines.append(
             _dotgraph_html.replace("{dotgraph}", dotstr).replace(
-                "{height}", f"{400 + 10*len(selected_nodes)}px"
+                "{height}", f"{400 + 20*len(selected_nodes)}px"
             )
         )
     return out_lines

@@ -461,3 +461,9 @@ a.external {
   text-align: left;
   /*width: 800px;*/
 }
+
+
+.center {
+  margin: auto;
+  width: 100%;
+}
