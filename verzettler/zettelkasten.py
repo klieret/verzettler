@@ -15,8 +15,7 @@ import networkx as nx
 from verzettler.note import Note
 from verzettler.log import logger
 from verzettler.note_converter import NoteConverter
-from verzettler.util import remove_duplicates
-
+from verzettler.util.paths import remove_duplicates
 
 # Methods as functions defined here for better caching
 

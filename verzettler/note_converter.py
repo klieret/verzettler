@@ -249,6 +249,9 @@ class PandocConverter(NoteConverter):
                 except KeyError:
                     logger.error(f"Couldn't find note {nid}")
 
+            # todo: Add hyperrefs for normal weblinks, using this regex:
+            # https://www.geeksforgeeks.org/python-check-url-string/
+
             if not remove_line:
                 out_lines.append(md_line.text)
 

@@ -13,7 +13,7 @@ import pyperclip
 
 # ours
 import verzettler.cli_util as cli_util
-from verzettler.util import get_zk_base_dirs_from_env
+from verzettler.util.paths import get_zk_base_dirs_from_env
 from verzettler.log import logger
 from verzettler.bin.zk_open import add_action_option, handle_action_on_path
 from verzettler.note import Note

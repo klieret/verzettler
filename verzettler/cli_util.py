@@ -13,7 +13,7 @@ import logging
 from termcolor import colored
 
 # ours
-from verzettler.util import get_zk_base_dirs_from_env, pass_fct
+from verzettler.util.paths import get_zk_base_dirs_from_env, pass_fct
 from verzettler.log import logger
 
 

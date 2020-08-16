@@ -81,7 +81,7 @@ def zk_name_pie_chart(zk: Zettelkasten):
     # fixme: problems if we have <= 2 zks
     data['color'] = Reds[len(x)]
 
-    p = figure(
+    p = figure(g 
         plot_height=350,
         title="Pie Chart",
         toolbar_location=None,

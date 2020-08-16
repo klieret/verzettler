@@ -1,12 +1,8 @@
-#!/usr/bin/env python3
-
-# std
-from typing import List, Optional
-from pathlib import Path
-import shlex
 import os
+import shlex
+from pathlib import Path
+from typing import List, Optional
 
-# ours
 from verzettler.log import logger
 
 

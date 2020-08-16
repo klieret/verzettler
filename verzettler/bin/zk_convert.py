@@ -7,7 +7,7 @@
 from verzettler.cli_util import init_zk_from_cli
 from verzettler.note_converter import JekyllConverter
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.util import get_jekyll_home_from_env
+from verzettler.util.paths import get_jekyll_home_from_env
 
 
 def cli():

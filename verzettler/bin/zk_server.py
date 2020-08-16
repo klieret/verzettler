@@ -14,7 +14,7 @@ import tabulate
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.util import get_zk_base_dirs_from_env
+from verzettler.util.paths import get_zk_base_dirs_from_env
 from verzettler.log import logger
 from verzettler.note_converter import PandocConverter, dotgraph_html
 from verzettler.bokeh_plots import make_backlink_histogram, make_link_histogram, depth_histogram, zk_name_pie_chart
