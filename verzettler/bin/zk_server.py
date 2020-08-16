@@ -57,6 +57,15 @@ def open_external(program, zid):
         return "Invalid program"
 
 
+@app.route("/reload")
+def reload():
+    global zk
+    zk = Zettelkasten()
+    for d in get_zk_base_dirs_from_env():
+        zk.add_notes_from_directory(d)
+    return "Reloaded."
+
+
 @app.route("/dashboard")
 def dashboard():
     plots = [
