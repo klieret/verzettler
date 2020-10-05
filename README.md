@@ -10,6 +10,10 @@ the time to brush it up for others to use it.
 pip3 install .
 ```
 
+If you are on windows, then you might have to replace
+``readline`` with the ``pyreadline`` requirement
+in ``requirements.txt``.
+
 ## Development installation
 
 Please install the pre-commit hooks
