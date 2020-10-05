@@ -9,6 +9,7 @@ import sys
 from verzettler.cli_util import init_zk_from_cli
 from verzettler.zettelkasten import Zettelkasten
 from verzettler.log import logger
+from verzettler.dotgraphgenerator import DotGraphGenerator
 
 
 def format_dot_html(dot_str: str) -> str:
@@ -26,14 +27,20 @@ def format_dot_html(dot_str: str) -> str:
     return html
 
 
+def _get_dot(zk: Zettelkasten):
+    return DotGraphGenerator(zk=zk).graph_from_notes(
+        list(map(lambda n: n.nid, zk.notes))
+    )
+
+
 def _output_html(zk: Zettelkasten, path: Path) -> None:
     with path.open("w") as outf:
-        outf.write(format_dot_html(zk.dot_graph()))
+        outf.write(format_dot_html(_get_dot(zk)))
 
 
 def _output_dot(zk: Zettelkasten, path: Path) -> None:
     with path.open("w") as outf:
-        outf.write(zk.dot_graph())
+        outf.write(_get_dot(zk=zk))
 
 
 output_format_to_converter = {".html": _output_html, ".dot": _output_dot}
