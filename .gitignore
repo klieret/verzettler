@@ -6,3 +6,5 @@
 *.pyc
 verzettler.egg-info/**
 .coverage
+build/
+dist/

@@ -23,7 +23,7 @@ this_dir = Path(__file__).resolve().parent
 
 packages = setuptools.find_packages()
 
-with (this_dir / "README.rst").open() as fh:
+with (this_dir / "README.md").open() as fh:
     long_description = fh.read()
 
 with (this_dir / "verzettler" / "version.txt").open() as vf:
@@ -47,6 +47,13 @@ setup(
         "Bug Tracker": "https://github.com/klieret/verzettler/issues",
         "Source Code": "https://github.com/klieret/verzettler/",
     },
+    extras_require={
+        ':sys_platform == "win32"': ['pyreadline'],
+        ':sys_platform == "linux2"': ['readline'],
+        ':sys_platform == "linux"': ['readline'],
+        ':sys_platform == "darwin"': ['readline'],
+    },
+
     include_package_data=True,
     keywords=keywords,
     description=description,
