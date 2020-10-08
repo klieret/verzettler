@@ -4,6 +4,7 @@
 import subprocess
 import logging
 from pathlib import Path
+import argparse
 
 # 3rd
 from flask import Flask
@@ -23,6 +24,11 @@ from verzettler.bokeh_plots import (
     depth_histogram,
     zk_name_pie_chart,
 )
+from verzettler.cli_util import (
+    add_zk_dirs_arg,
+    add_debug_args,
+    default_arg_handling,
+)
 
 
 templates = Path(__file__).resolve().parent.parent / "templates"
@@ -34,12 +40,10 @@ app = Flask(
 )
 app.config["SECRET_KEY"] = "asfnfl1232#"
 
-# https://stackoverflow.com/questions/9508667/reload-flask-app-when-template-file-changes
+# https://stackoverflow.com/questions/9508667/
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 zk = Zettelkasten()
-for d in get_zk_base_dirs_from_env():
-    zk.add_notes_from_directory(d)
 
 # jekyll_converter = JekyllConverter(zk=zk)
 pandoc_converter = PandocConverter(zk=zk, self_contained=False)
@@ -161,6 +165,17 @@ def asset(path: str):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+
+    add_zk_dirs_arg(parser)
+    add_debug_args(parser)
+    args = parser.parse_args()
+    default_arg_handling(args)
+
+    global zk
+    for d in args.input:
+        zk.add_notes_from_directory(d)
+
     app.logger.setLevel(logging.DEBUG)
     app.run()
 
