@@ -1,3 +1,6 @@
 include readme.md
 include verzettler/version.txt
 include verzettler/html_resources/*
+include verzettler/static/css/*
+include verzettler/static/js/*
+include verzettler/templates/*
