@@ -159,11 +159,14 @@ def root():
     return open(zk.root)
 
 
-@app.route("/assets/<path>")
-def asset(path: str):
-    realpath = Path("_site") / "assets" / path
-    print(path, realpath)
-    return app.send_static_file(str(realpath))
+@app.route("/assets/<path:path>")
+def assets(path: str):
+    logger.info("Assets!")
+    # realpath = Path("_site") / "assets" / path
+    # print(path, realpath)
+    path = "/" + path
+    logger.info(path)
+    return app.send_static_file(path)
 
 
 def main():

@@ -17,10 +17,11 @@ class Note(object):
     id_link_regex_no_group = re.compile(r"\[\[[0-9]{14}\]\]")
     tag_regex = re.compile(r"#\S*")
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
-    markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
+    markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*)\.md(\s\".*\")*\)")
     external_link_regex = re.compile(
         r"(?<!\!)\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)"
     )
+    picture_link_regex = re.compile(r"!\[([^\]]*)\]\(([^)]+)*\)")
     section_regex = re.compile(r"(#+)\s+(.+)")
 
     def __init__(self, path: Path):
