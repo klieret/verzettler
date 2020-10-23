@@ -54,6 +54,8 @@ class TestNote(TestCase):
                 ("a", 'https://a/b/c/x.html "something"')
             ],
             '[Master](../../szettel/mds/master_00000000000000.md "autogen")': [],
+            "![picture](../assets/path/to/picture.png)": [],
+            "![picture](https://a/b/c/x.png)": [],
         }
         self._test_regex_findall_dict(Note.external_link_regex, dct)
 
