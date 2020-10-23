@@ -44,6 +44,7 @@ app.config["SECRET_KEY"] = "asfnfl1232#"
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 zk = Zettelkasten()
+zk_directories = []
 
 # jekyll_converter = JekyllConverter(zk=zk)
 pandoc_converter = PandocConverter(zk=zk, self_contained=False)
@@ -64,8 +65,9 @@ def open_external(program, zid):
 @app.route("/reload")
 def reload():
     global zk
+    global zk_directories
     zk = Zettelkasten()
-    for d in get_zk_base_dirs_from_env():
+    for d in zk_directories:
         zk.add_notes_from_directory(d)
     return "Reloaded."
 
@@ -173,7 +175,9 @@ def main():
     default_arg_handling(args)
 
     global zk
-    for d in args.input:
+    global zk_directories
+    zk_directories = args.input
+    for d in zk_directories:
         zk.add_notes_from_directory(d)
 
     app.logger.setLevel(logging.DEBUG)
