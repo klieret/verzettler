@@ -19,7 +19,7 @@ class Note(object):
     autogen_link_regex = re.compile(r" *\[[^\]]*\]\([^)\"]* \"autogen\"\)")
     markdown_link_regex = re.compile(r"\[([^\]]*)\]\(([^)]*).md(\s\".*\")*\)")
     external_link_regex = re.compile(
-        r"\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)"
+        r"(?<!\!)\[([^\]]*)\]\(([^)\s]*(?<!.md)(?:\s.*)?)\)"
     )
     section_regex = re.compile(r"(#+)\s+(.+)")
 
