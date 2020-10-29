@@ -216,14 +216,14 @@ class PandocConverter(NoteConverter):
         self.zk = zk
         self.self_contained = self_contained
 
-    # @staticmethod
-    # def _picture_link_absolute_path(note: Note, line: str) -> str:
-    #     for result in note.picture_link_regex.findall(line):
-    #         # Doesn't support spaces in names
-    #         link = result[1].split(" ")[0]
-    #         link_resolved = "/assets" + str((note.path / link).resolve())
-    #         line = line.replace(link, link_resolved)
-    #     return line
+    @staticmethod
+    def _picture_link_absolute_path(note: Note, line: str) -> str:
+        for result in note.picture_link_regex.findall(line):
+            # Doesn't support spaces in names
+            link = result[1].split(" ")[0]
+            link_resolved = "/assets" + str((note.path.parent / link).resolve())
+            line = line.replace(link, link_resolved)
+        return line
 
     def preproc_markdown(self, note: Note) -> str:
         out_lines = []
@@ -252,9 +252,9 @@ class PandocConverter(NoteConverter):
                     r'<a href="\2" class="external">\1</a>', md_line.text
                 )
 
-                # md_line.text = self._picture_link_absolute_path(
-                #     note, md_line.text
-                # )
+                md_line.text = self._picture_link_absolute_path(
+                    note, md_line.text
+                )
 
                 # Remove old markdown links
                 md_line.text = note.autogen_link_regex.sub("", md_line.text,)

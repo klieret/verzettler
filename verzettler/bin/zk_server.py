@@ -160,16 +160,11 @@ def root():
     return open(zk.root)
 
 
-@app.route("/<path:path>")
+@app.route("/assets/<path:path>")
 def assets(path: str):
-    logger.info("Assets!")
-    global zk_directories
-    # todo: this should be done properly
-    for d in [*zk_directories, *[d.parent for d in zk_directories]]:
-        full_path = (d / path).resolve()
-        if full_path.is_file():
-            return send_file(full_path)
-    # todo: what if not found?
+    path = "/" + path
+    logger.debug(f"Asset {path}")
+    return send_file(path)
 
 
 def main():
