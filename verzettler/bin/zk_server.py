@@ -5,10 +5,11 @@ import subprocess
 import logging
 from pathlib import Path
 import argparse
+import json
 
 # 3rd
 from flask import Flask
-from flask import render_template, redirect, send_file
+from flask import render_template, redirect, send_file, request
 from bokeh.embed import components
 from bokeh.resources import INLINE
 import tabulate
@@ -150,6 +151,24 @@ def open(notespec: str):
     return render_template(
         "page.html", pandoc_output=converted, title=note.title, dot=dot,
     )
+
+
+@app.route("/edit/<string:notespec>", methods=["POST", "GET"])
+def edit(notespec: str):
+    if request.method == "GET":
+        logger.debug(f"Opening in the editor {notespec}")
+        content = Path(zk[notespec].path).read_text()
+        url = "/edit/" + notespec
+        return render_template("edit.html", value=content, id=url)
+    elif request.method == "POST":
+        new_version = request.json["content"]
+        path = zk[notespec].path
+        logger.debug(f"Save from the editor {notespec} to {path}")
+        with path.open("w") as outf:
+            outf.write(new_version)
+        return redirect(f"/open/{notespec}")
+    else:
+        raise ValueError
 
 
 @app.route("/open/")
