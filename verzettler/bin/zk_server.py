@@ -15,7 +15,6 @@ import tabulate
 
 # ours
 from verzettler.zettelkasten import Zettelkasten
-from verzettler.util.paths import get_zk_base_dirs_from_env
 from verzettler.log import logger
 from verzettler.note_converter import PandocConverter, dotgraph_html
 from verzettler.bokeh_plots import (
@@ -45,7 +44,6 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 zk = Zettelkasten()
 zk_directories = []
-zk_asset_directories = []
 
 # jekyll_converter = JekyllConverter(zk=zk)
 pandoc_converter = PandocConverter(zk=zk, self_contained=False)
@@ -162,7 +160,10 @@ def root():
 
 @app.route("/assets/<path:path>")
 def assets(path: str):
-    path = "/" + path
+    # fixme: This might be a security flaw if deployed on a real webserver,
+    #   should rather add more static directories
+    path = Path("/" + path)
+    assert path.suffix.lower() in [".png", ".svg", ".jpg", ".jpeg"]
     logger.debug(f"Asset {path}")
     return send_file(path)
 
@@ -177,11 +178,7 @@ def main():
 
     global zk
     global zk_directories
-    global zk_asset_directories
     zk_directories = args.input
-    zk_asset_directories = [
-        (Path(d).parent / "assets").resolve() for d in zk_directories
-    ]
     for d in zk_directories:
         zk.add_notes_from_directory(d)
 
