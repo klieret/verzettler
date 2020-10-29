@@ -42,11 +42,17 @@ const sendContent= (it)=> {
               'Content-Type': 'application/json'
               // 'Content-Type': 'application/x-www-form-urlencoded',
             },
+            redirect: 'follow',
             body: JSON.stringify(
                 {content: vditor.getValue()}
             )
         }
-    )
+    ).then(response => {
+        // HTTP 301 response / redirect
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    })
 }
 
 </script>

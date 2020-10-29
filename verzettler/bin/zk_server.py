@@ -162,8 +162,13 @@ def edit(notespec: str):
         return render_template("edit.html", value=content, id=url)
     elif request.method == "POST":
         new_version = request.json["content"]
-        print(new_version)
-        logger.debug(f"Save from the editor {notespec}")
+        path = zk[notespec].path
+        logger.debug(f"Save from the editor {notespec} to {path}")
+        with path.open("w") as outf:
+            outf.write(new_version)
+        return redirect(f"/open/{notespec}")
+    else:
+        raise ValueError
 
 
 @app.route("/open/")
