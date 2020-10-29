@@ -33,8 +33,21 @@ let vditor
 
 
 const sendContent= (it)=> {
-    // alert(vditor.getValue()) 
-    fetch(id, {method:"POST", body: JSON.stringify({content: vditor.getValue()})})}
+    // alert(vditor.getValue())
+    fetch(
+        id,
+        {
+            method:"POST",
+            headers: {
+              'Content-Type': 'application/json'
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(
+                {content: vditor.getValue()}
+            )
+        }
+    )
+}
 
 </script>
    <!-- mode: 'wysiwyg'})

@@ -161,7 +161,7 @@ def edit(notespec: str):
         url = "/edit/" + notespec
         return render_template("edit.html", value=content, id=url)
     elif request.method == "POST":
-        new_version = json.loads(request.json)
+        new_version = request.json["content"]
         print(new_version)
         logger.debug(f"Save from the editor {notespec}")
 
