@@ -8,7 +8,7 @@ import argparse
 
 # 3rd
 from flask import Flask
-from flask import render_template, redirect
+from flask import render_template, redirect, send_file
 from bokeh.embed import components
 from bokeh.resources import INLINE
 import tabulate
@@ -45,6 +45,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 zk = Zettelkasten()
 zk_directories = []
+zk_asset_directories = []
 
 # jekyll_converter = JekyllConverter(zk=zk)
 pandoc_converter = PandocConverter(zk=zk, self_contained=False)
@@ -159,14 +160,16 @@ def root():
     return open(zk.root)
 
 
-@app.route("/assets/<path:path>")
+@app.route("/<path:path>")
 def assets(path: str):
     logger.info("Assets!")
-    # realpath = Path("_site") / "assets" / path
-    # print(path, realpath)
-    path = "/" + path
-    logger.info(path)
-    return app.send_static_file(path)
+    global zk_directories
+    # todo: this should be done properly
+    for d in [*zk_directories, *[d.parent for d in zk_directories]]:
+        full_path = (d / path).resolve()
+        if full_path.is_file():
+            return send_file(full_path)
+    # todo: what if not found?
 
 
 def main():
@@ -179,7 +182,11 @@ def main():
 
     global zk
     global zk_directories
+    global zk_asset_directories
     zk_directories = args.input
+    zk_asset_directories = [
+        (Path(d).parent / "assets").resolve() for d in zk_directories
+    ]
     for d in zk_directories:
         zk.add_notes_from_directory(d)
 
