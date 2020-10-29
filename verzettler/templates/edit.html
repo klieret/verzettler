@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>Verzettel editor</title>
+    <meta http-equiv="Window-target" content="_top"/>
+    <script src='/static/js/edit.js' defer></script>
+</head>
+<body>
+<p>NAVBAR</p>
+</p>
+
+<div class="wrapper">
+    <div id="vditor"></div>
+    <div id="vdit"></div>
+    <button class="btn btn--small"onclick="document.getElementById('vditor').value=vditor.getValue();sendContent(this, vditor.getSelection())";'> Save</button> &nbsp;
+</div>
+
+<script>
+const content = {{value |tojson}};
+const id = {{id|tojson}};
+
+let vditor
+  vditorScript = () => {
+    vditor = new Vditor('vditor', { height: 360,
+                                    width: 800,
+                                    cache: {enable: false},
+                                    value: content,
+                                    lang: 'en_US',
+                                    mode: 'ir',
+                                    preview: {math:{engine:'MathJax'}}})};
+
+
+const sendContent= (it)=> {
+    // alert(vditor.getValue()) 
+    fetch(id, {method:"POST", body: JSON.stringify({content: vditor.getValue()})})}
+
+</script>
+   <!-- mode: 'wysiwyg'})
+   https://b3log.org/vditor/demo/method-get.html
+   https://stackoverflow.com/questions/6396101/pure-javascript-send-post-data-without-a-form
+   view-source:https://b3log.org/vditor/demo/advanced-toolbar.html
+   https://b3log.org/vditor/demo/advanced-upload.html
+        mode: 'ir'})
+        mode: 'sv',preview:{mode:'editor'}})
+        mode: 'sv',preview:{mode:'both'}})"> double panel   -->
+</body>
+</html>
