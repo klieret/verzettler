@@ -161,7 +161,7 @@ class JekyllConverter(NoteConverter):
 
             if i == 1:
                 out_lines.append(
-                    f"[Open in typora](/open/typora/{note.nid})\n\n"
+                    f"[Edit in browser](/edit/{note.nid}) [Open in typora](/open/typora/{note.nid})\n\n"
                 )
 
             remove_line = False
@@ -232,7 +232,7 @@ class PandocConverter(NoteConverter):
 
             if i == 1:
                 out_lines.append(
-                    f"[Open in typora](/open/typora/{note.nid})\n\n"
+                    f"[Edit in browser](/edit/{note.nid}) [Open in typora](/open/typora/{note.nid})\n\n"
                 )
 
             remove_line = False
