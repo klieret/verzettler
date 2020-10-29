@@ -1,6 +1,6 @@
 # Verzettler
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Currently this project is in alpha-beta stage.
@@ -36,6 +36,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/Pablo2m"><img src="https://avatars3.githubusercontent.com/u/557413?v=4" width="100px;" alt=""/><br /><sub><b>Pablo2m</b></sub></a><br /><a href="https://github.com/klieret/verzettler/commits?author=Pablo2m" title="Code">💻</a> <a href="https://github.com/klieret/verzettler/issues?q=author%3APablo2m" title="Bug reports">🐛</a> <a href="#ideas-Pablo2m" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://www.lieret.net"><img src="https://avatars3.githubusercontent.com/u/13602468?v=4" width="100px;" alt=""/><br /><sub><b>Kilian Lieret</b></sub></a><br /><a href="https://github.com/klieret/verzettler/commits?author=klieret" title="Code">💻</a> <a href="#ideas-klieret" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-klieret" title="Maintenance">🚧</a> <a href="https://github.com/klieret/verzettler/pulls?q=is%3Apr+reviewed-by%3Aklieret" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 
