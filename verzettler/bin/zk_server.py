@@ -152,6 +152,11 @@ def open(notespec: str):
         "page.html", pandoc_output=converted, title=note.title, dot=dot,
     )
 
+@app.route("/view/<string:notespec>")
+def render(notespec: str):
+    logger.debug(f"Opening in the viewer {notespec}")
+    content = Path(zk[notespec].path).read_text()
+    return render_template("render.html", value=content, id=url)
 
 @app.route("/edit/<string:notespec>", methods=["POST", "GET"])
 def edit(notespec: str):
@@ -169,7 +174,6 @@ def edit(notespec: str):
         return redirect(f"/open/{notespec}")
     else:
         raise ValueError
-
 
 @app.route("/open/")
 @app.route("/")

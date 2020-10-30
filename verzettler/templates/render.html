@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Render</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vditor@latest/dist/index.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/vditor@latest/dist/method.min.js"></script>
+    <style>preview{max-width: 90%; width: 600px; margin: 0 auto; padding-bottom: 20px; }</style>
+</head>
+<body>
+
+<div id="preview"></div>
+
+<textarea id="raw" style="display:none;">{{value}}</textarea>
+<script>
+Vditor.preview(document.getElementById('preview'),
+  document.getElementById("raw").textContent, {
+    speech: {enable: true,},
+    lang: 'en_US',
+    anchor: true,})
+</script>
+</body>
+</html>
