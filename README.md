@@ -34,8 +34,9 @@ The webserver shows a smart portion of the graph of neighboring nodes for each n
 
 ![note environment graph](readme_assets/note_environment_graph_small.png)
 
-
 ## Installation
+
+Verzettlr needs python >= 3.7. You can install this project using
 
 ```sh
 pip3 install .
