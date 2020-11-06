@@ -46,10 +46,10 @@ Please also make sure that you have the `pandoc` package installed
 
 ### Development installation
 
-Please install the pre-commit hooks
+Please install the pre-commit hooks and tools for testing
 
 ```
-pip3 install pre-commit
+pip3 install pre-commit pytest pytest-cov
 cd verzettler
 pre-commit install
 ```

@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install .
-        pip install flake8 pytest
+        pip install flake8 pytest pytest-cov
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
