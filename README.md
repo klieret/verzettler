@@ -1,10 +1,10 @@
 # Verzettler
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END --> 
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![gh actions](https://github.com/klieret/verzettler/workflows/testing/badge.svg)
 
-**Currently this project is in alpha-beta stage. I'm using it personally on a regular basis, but it's still very experimental.**
+**Currently this project is in an alpha stage. I'm using it personally on a regular basis, but it's still very experimental. Let's discuss where this could go!**
 
 ## Non-linear, non-hierarchical knowledge management
 
@@ -35,7 +35,7 @@ Among these are
 * Tools to make bulk operations on your notes. E.g. to introduce backlinks (a section at the end of each note where all notes that link to the note are linked)
 * Tools to convert your notes to other formats.
 * A local web server to browse through your notes through your web server. Experimental support to edit your notes directly in your webbrowser was recently implemented as well.
-* Tools to analyze the graph structore of your Zettelkasten.
+* Tools to analyze the graph structure of your Zettelkasten.
 
 Eventually this project might converge to a browser based tool to fully manage your notes directly from the webbrowser while keeping support for other external editors, but currently it's still bits and pieces.
 
@@ -43,13 +43,16 @@ Eventually this project might converge to a browser based tool to fully manage y
 
 ### The webserver
 
-The webserver shows a smart portion of the graph of neighboring nodes for each note:
+* The webserver shows a smart portion of the graph of neighboring nodes for each note:
 
 ![note environment graph](readme_assets/note_environment_graph_small.png)
 
-It also has a fancy dashboard that shows some statistics about the distribution of notes:
+* It also has a fancy dashboard that shows some statistics about the distribution of notes:
 
 ![dashboard](readme_assets/dashboard_small.png)
+
+* Shortcut buttons to open the note in an external editor (like `typora`)
+* Edit note in browser (alpha)
 
 ## Installation
 
