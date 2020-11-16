@@ -13,9 +13,21 @@ The Zettelkasten (German for *slipbox*) method is a radical departure from this:
 
 But let me refer you to other people for the big words. I really enjoyed [this article](https://writingcooperative.com/zettelkasten-how-one-german-scholar-was-so-freakishly-productive-997e4e0ca125) about [Niklas Luhman](https://en.wikipedia.org/wiki/Niklas_Luhmann), a German Sociologist of the 20th century who built up an analogue knowledge management system made from thousands of small notes.
 
+### Notable existing software solutions
+
+| Name                                                         | Open source? | Description        |
+| ------------------------------------------------------------ | ------------ | ------------------ |
+| [roamresearch](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjq8KGZtYftAhWF2eAKHbeUCjQQFjAAegQIAhAC&url=https%3A%2F%2Froamresearch.com%2F&usg=AOvVaw2IVLaYJIjOUXlHrP2enUUs) | No           | In-browser         |
+| [org-roam](https://github.com/org-roam/org-roam)             | Yes          | Plugin for emacs   |
+| [org-brain](https://github.com/Kungsgeten/org-brain)         | Yes          | Plugin for emacs   |
+| [logseq](https://github.com/logseq/logseq)                   | Soon (?)     | In-browser         |
+| [zettlr](https://github.com/Zettlr/Zettlr)                   | Yes          | Electron based app |
+
+And certainly many more (feel free to open a PR to add your favorite piece of software)!
+
 ## The tools in this repository
 
-This repository contains a selection of different tools to help you manage your own Zettelkasten, which are kept as Markdown files in a way that [Zettlr](https://www.zettlr.com/) understands them.
+This repository contains a selection of different tools to help you manage your own Zettelkasten, which are kept as Markdown files in a way that [Zettlr](https://www.zettlr.com/) and others understand them.
 
 Among these are
 
@@ -28,9 +40,15 @@ Eventually this project might converge to a browser based tool to fully manage y
 
 ## Selected features
 
+### The webserver
+
 The webserver shows a smart portion of the graph of neighboring nodes for each note:
 
 ![note environment graph](readme_assets/note_environment_graph_small.png)
+
+It also has a fancy dashboard that shows some statistics about the distribution of notes:
+
+![dashboard](readme_assets/dashboard_small.png)
 
 ## Installation
 
