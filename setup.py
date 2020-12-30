@@ -11,13 +11,9 @@ from pathlib import Path
 # Without this import, install_requires won't work.
 
 
-keywords = [
-    "zettelkasten"
-]
+keywords = ["zettelkasten"]
 
-description = (
-    "Helper scripts for markdown based Zettelkasten."
-)
+description = "Helper scripts for markdown based Zettelkasten."
 
 this_dir = Path(__file__).resolve().parent
 
@@ -48,12 +44,11 @@ setup(
         "Source Code": "https://github.com/klieret/verzettler/",
     },
     extras_require={
-        ':sys_platform == "win32"': ['pyreadline'],
-        ':sys_platform == "linux2"': ['readline'],
-        ':sys_platform == "linux"': ['readline'],
-        ':sys_platform == "darwin"': ['readline'],
+        ':sys_platform == "win32"': ["pyreadline"],
+        ':sys_platform == "linux2"': ["readline"],
+        ':sys_platform == "linux"': ["readline"],
+        ':sys_platform == "darwin"': ["readline"],
     },
-
     include_package_data=True,
     keywords=keywords,
     description=description,
@@ -79,5 +74,5 @@ setup(
             "zk_convert = verzettler.bin.zk_convert:cli",
             "zk_server = verzettler.bin.zk_server:main",
         ]
-    }
+    },
 )
