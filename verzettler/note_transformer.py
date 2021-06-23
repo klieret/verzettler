@@ -10,6 +10,7 @@ import os.path
 from verzettler.zettelkasten import Zettelkasten
 from verzettler.note import Note
 from verzettler.markdown_reader import MarkdownReader
+from verzettler.log import logger
 
 
 class NoteTransformer(ABC):
@@ -21,10 +22,12 @@ class NoteTransformer(ABC):
         pass
 
     def transform_write(self, note: Note, path: Optional[PurePath] = None):
+        # todo: add output about whether changes were made
         if path:
             path = Path(path)
         else:
             path = note.path
+        logger.debug(f"Transforming note {note.path} and writing to {path}")
         transformed = self.transform(note)
         with path.open("w") as outf:
             outf.write(transformed)

@@ -258,13 +258,14 @@ class Zettelkasten(object):
         directory = Path(directory)
         for root, dirs, files in os.walk(str(directory), topdown=True):
             dirs[:] = [d for d in dirs if d not in [".git"]]
-            self.add_notes(
-                [
-                    Note(Path(root) / file)
-                    for file in files
-                    if file.endswith(".md")
-                ]
-            )
+            notes = [
+                Note(Path(root) / file)
+                for file in files
+                if file.endswith(".md")
+            ]
+            if notes:
+                self.add_notes(notes)
+                logger.info(f"Added {len(notes)} notes from {root}")
 
     # MISC
     # =========================================================================
