@@ -102,9 +102,11 @@ def set_path_autocompleter(results: List[PurePath]) -> None:
 
 
 def get_path_selection(
-    results: List[PurePath], search: Optional[str] = None, lucky=False,
+    results: List[PurePath],
+    search: Optional[str] = None,
+    lucky=False,
 ) -> Optional[PurePath]:
-    """ Given a list of search results for paths to notes, let the user pick
+    """Given a list of search results for paths to notes, let the user pick
     the one he wants
 
     Args:

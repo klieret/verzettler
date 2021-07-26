@@ -8,7 +8,11 @@ from bokeh.plotting import figure
 
 
 def int_hist_from_binned_data(
-    arr_hist, edges, title, x_axis_label, x_tooltip,
+    arr_hist,
+    edges,
+    title,
+    x_axis_label,
+    x_tooltip,
 ):
     # todo: do I really need pandas for this?
     # Column data source
@@ -68,9 +72,14 @@ def int_hist_from_binned_data(
 
 
 def int_hist(
-    data, bins, **kwargs,
+    data,
+    bins,
+    **kwargs,
 ):
-    """Plot interactive histogram using bokeh.
-    """
+    """Plot interactive histogram using bokeh."""
     arr_hist, edges = np.histogram(data, bins=bins)
-    return int_hist_from_binned_data(arr_hist=arr_hist, edges=edges, **kwargs,)
+    return int_hist_from_binned_data(
+        arr_hist=arr_hist,
+        edges=edges,
+        **kwargs,
+    )

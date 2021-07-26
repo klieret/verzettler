@@ -149,7 +149,10 @@ def open(notespec: str):
     converted = pandoc_converter.convert(note)
     dot = "".join(dotgraph_html(zk, note))
     return render_template(
-        "page.html", pandoc_output=converted, title=note.title, dot=dot,
+        "page.html",
+        pandoc_output=converted,
+        title=note.title,
+        dot=dot,
     )
 
 
