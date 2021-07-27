@@ -42,7 +42,7 @@ class Note(object):
 
     @classmethod
     def get_nid(cls, path: Union[str, PurePath]) -> str:
-        """ Note ID"""
+        """Note ID"""
         path = PurePath(path)
         matches = cls.id_regex.findall(path.name)
         if matches:
@@ -64,7 +64,7 @@ class Note(object):
     # =========================================================================
 
     def _analyze_file(self) -> None:
-        """ Should be called only once! """
+        """Should be called only once!"""
 
         md_reader = MarkdownReader.from_file(self.path)
         for md_line in md_reader.lines:
@@ -72,8 +72,9 @@ class Note(object):
                 if self.title and self.title != md_line.current_section[0]:
                     logger.warning(f"{self.path} Warning: Multiple titles. ")
                 self.title = md_line.current_section[0]
-            if not md_line.is_code_block and md_line.text.lower().strip().startswith(
-                "tags: "
+            if (
+                not md_line.is_code_block
+                and md_line.text.lower().strip().startswith("tags: ")
             ):
                 if self.tags:
                     logger.warning(

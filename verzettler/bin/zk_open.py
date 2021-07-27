@@ -32,7 +32,10 @@ def get_search_results(search_dirs: List[Path], search_term: str) -> List[Path]:
         ["-type", "f", "-not", "-wholename", "*/.git*", "-name", search_term]
     )
 
-    opt = subprocess.check_output(sb_params, universal_newlines=True,).strip()
+    opt = subprocess.check_output(
+        sb_params,
+        universal_newlines=True,
+    ).strip()
 
     if not opt.replace("\n", ""):
         return []
@@ -73,7 +76,8 @@ def cli():
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
     parser.add_argument(
-        dest="search", help="Search term",
+        dest="search",
+        help="Search term",
     )
     parser.add_argument(
         "--lucky",
@@ -89,7 +93,9 @@ def cli():
     )
 
     selection = cli_util.get_path_selection(
-        results, search=args.search, lucky=args.lucky,
+        results,
+        search=args.search,
+        lucky=args.lucky,
     )
     if not selection:
         logger.critical("Nothing found.")

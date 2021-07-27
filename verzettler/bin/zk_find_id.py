@@ -17,7 +17,8 @@ def cli():
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
     parser.add_argument(
-        dest="search", help="Search term",
+        dest="search",
+        help="Search term",
     )
     args = parser.parse_args()
     cli_util.default_arg_handling(args)

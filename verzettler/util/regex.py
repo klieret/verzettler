@@ -12,7 +12,7 @@ _url_regex = re.compile(
 
 
 def find_urls(string: str) -> List[str]:
-    """ Finds all URLs in given string.
+    """Finds all URLs in given string.
     Source: https://www.geeksforgeeks.org/python-check-url-string/
 
     Args:

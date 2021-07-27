@@ -13,8 +13,7 @@ from verzettler.markdown_reader import MarkdownReader
 
 
 class NoteTransformer(ABC):
-    """ Takes a note and transforms underlying markdown file
-    """
+    """Takes a note and transforms underlying markdown file"""
 
     @abstractmethod
     def transform(self, note: Note) -> str:
@@ -102,7 +101,10 @@ class DefaultTransformer(NoteTransformer):
                     tags = self.tag_transformer(set())
                     if tags:
                         out_lines.extend(
-                            ["\n", self._format_tags(tags),]
+                            [
+                                "\n",
+                                self._format_tags(tags),
+                            ]
                         )
 
             # Modifying tags if already given
