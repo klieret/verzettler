@@ -4,7 +4,11 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![gh actions](https://github.com/klieret/verzettler/workflows/testing/badge.svg)
 
-**Currently this project is in an alpha stage. I'm using it personally on a regular basis, but it's still very experimental. Let's discuss where this could go!**
+**This project is more of an easy to hack experimental playground than a finished product**
+
+I'm using parts of it on a regular basis, and you probably will find some helpful
+tooling there as well. But it's not a coherent polished package.
+If you have come cool additions or suggestions, I'm all ears though.
 
 ## Non-linear, non-hierarchical knowledge management
 
@@ -18,11 +22,12 @@ But let me refer you to other people for the big words. I really enjoyed [this a
 
 | Name                                                         | Open source? | Description        |
 | ------------------------------------------------------------ | ------------ | ------------------ |
-| [roamresearch](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjq8KGZtYftAhWF2eAKHbeUCjQQFjAAegQIAhAC&url=https%3A%2F%2Froamresearch.com%2F&usg=AOvVaw2IVLaYJIjOUXlHrP2enUUs) | No           | In-browser         |
+| [roamresearch](https://roamresearch.com/)                    | No           |                    |
 | [org-roam](https://github.com/org-roam/org-roam)             | Yes          | Plugin for emacs   |
 | [org-brain](https://github.com/Kungsgeten/org-brain)         | Yes          | Plugin for emacs   |
 | [logseq](https://github.com/logseq/logseq)                   | Soon (?)     | In-browser         |
 | [zettlr](https://github.com/Zettlr/Zettlr)                   | Yes          | Electron based app |
+| [obsidian](https://obsidian.md/)                             | No           | Electron based app |
 
 And certainly many more (feel free to open a PR to add your favorite piece of software)!
 
