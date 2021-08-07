@@ -8,3 +8,4 @@ verzettler.egg-info/**
 .coverage
 build/
 dist/
+doc/_build/**
