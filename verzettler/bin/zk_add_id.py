@@ -34,7 +34,9 @@ def cli():
     parser = argparse.ArgumentParser()
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
-    parser.add_argument(dest="file",)
+    parser.add_argument(
+        dest="file",
+    )
     args = parser.parse_args()
     new_path = add_id(args.file)
     shutil.move(args.file, str(new_path))

@@ -182,7 +182,7 @@ class Zettelkasten(object):
         return res[0]
 
     def search(self, search: str) -> List[Note]:
-        """ Search. By default we will search in titles and in names.
+        """Search. By default we will search in titles and in names.
 
         Args:
             search:
@@ -287,7 +287,7 @@ class Zettelkasten(object):
     def apply_converter(
         self, converter: NoteConverter, output_basedir: Union[str, PurePath]
     ):
-        """ Apply converter to all notes in Zettelkasten. The target path for
+        """Apply converter to all notes in Zettelkasten. The target path for
         each note will be output_basedir/filename.
 
         Args:

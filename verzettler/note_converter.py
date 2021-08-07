@@ -21,8 +21,7 @@ from verzettler.util.regex import find_urls
 
 
 class NoteConverter(ABC):
-    """ Takes a note and transforms underlying markdown file
-    """
+    """Takes a note and transforms underlying markdown file"""
 
     @abstractmethod
     def convert(self, note: Note) -> str:
@@ -182,7 +181,10 @@ class JekyllConverter(NoteConverter):
             )
 
             # Remove old markdown links
-            md_line.text = note.autogen_link_regex.sub("", md_line.text,)
+            md_line.text = note.autogen_link_regex.sub(
+                "",
+                md_line.text,
+            )
 
             # Replace raw zids, leave only links
             nids = note.id_link_regex.findall(md_line.text)
@@ -257,7 +259,10 @@ class PandocConverter(NoteConverter):
                 )
 
                 # Remove old markdown links
-                md_line.text = note.autogen_link_regex.sub("", md_line.text,)
+                md_line.text = note.autogen_link_regex.sub(
+                    "",
+                    md_line.text,
+                )
 
                 # Replace raw zids, leave only links
                 nids = note.id_link_regex.findall(md_line.text)

@@ -55,7 +55,8 @@ def cli():
         required=False,
     )
     parser.add_argument(
-        dest="name", help="Name",
+        dest="name",
+        help="Name",
     )
     add_action_option(parser)
     args = parser.parse_args()

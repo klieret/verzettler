@@ -8,7 +8,11 @@ import re
 
 class MarkdownLine(object):
     def __init__(
-        self, text, is_code_block, current_section, is_last_line,
+        self,
+        text,
+        is_code_block,
+        current_section,
+        is_last_line,
     ):
         self.text = text
         self.is_code_block = is_code_block
