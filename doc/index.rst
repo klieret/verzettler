@@ -10,6 +10,7 @@ Welcome to verzettler's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   readme.md
 
 
 Indices and tables
