@@ -4,6 +4,9 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![gh actions](https://github.com/klieret/verzettler/workflows/testing/badge.svg)
+[![PR welcome](https://img.shields.io/badge/PR-Welcome-%23FF8300.svg)](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project)
+[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![License](https://img.shields.io/github/license/klieret/verzettler.svg)](https://github.com/klieret/verzettler/blob/master/LICENSE.txt)
 
 **This project is more of an easy to hack experimental playground than a finished product**
 
