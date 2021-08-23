@@ -3,6 +3,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+![experimental](https://img.shields.io/badge/-experimental-red)
 ![gh actions](https://github.com/klieret/verzettler/workflows/testing/badge.svg)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/klieret/verzettler/master.svg)](https://results.pre-commit.ci/latest/github/klieret/verzettler/master)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
