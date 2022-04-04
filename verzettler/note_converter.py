@@ -244,7 +244,7 @@ class PandocConverter(NoteConverter):
                     remove_line = True
 
                 for url in find_urls(md_line.text):
-                    if not re.findall(fr"\[.*\]\({url}\)", md_line.text):
+                    if not re.findall(rf"\[.*\]\({url}\)", md_line.text):
                         md_line.text = md_line.text.replace(
                             url, f"[{url}]({url})"
                         )
