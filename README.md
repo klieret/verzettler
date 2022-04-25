@@ -67,7 +67,7 @@ Eventually this project might converge to a browser based tool to fully manage y
 
 ## Installation
 
-Verzettlr needs python >= 3.7. You can install this project using
+Verzettler needs python >= 3.7. You can install this project using
 
 ```sh
 pip3 install .
