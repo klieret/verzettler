@@ -140,7 +140,6 @@ def dotgraph_html(zk, note: Note):
 
 
 class JekyllConverter(NoteConverter):
-
     # .replace("'", "\\'").replace("\n", "' + \n'")
 
     def __init__(self, zk):
@@ -157,7 +156,6 @@ class JekyllConverter(NoteConverter):
 
         md_reader = MarkdownReader.from_file(note.path)
         for i, md_line in enumerate(md_reader.lines):
-
             if i == 1:
                 out_lines.append(
                     f"[Edit in browser](/edit/{note.nid}) [Open in typora](/open/typora/{note.nid})\n\n"
@@ -231,7 +229,6 @@ class PandocConverter(NoteConverter):
         out_lines = []
         md_reader = MarkdownReader.from_file(note.path)
         for i, md_line in enumerate(md_reader.lines):
-
             if i == 1:
                 out_lines.append(
                     f"[Edit in browser](/edit/{note.nid}) [Open in typora](/open/typora/{note.nid})\n\n"

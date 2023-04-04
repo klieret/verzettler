@@ -22,7 +22,6 @@ class CategoryNodeColorPicker(NodeColorPicker):
     def __init__(
         self, zettelkasten: Zettelkasten, colors: Optional[List[str]] = None
     ):
-
         self.zettelkasten = zettelkasten
         if colors is None:
             colors = [
