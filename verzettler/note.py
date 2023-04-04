@@ -11,7 +11,6 @@ from verzettler.log import logger
 
 
 class Note(object):
-
     id_regex = re.compile("(?<![0-9])[0-9]{14}(?![0-9])")
     id_link_regex = re.compile(r"\[\[([0-9]{14})\]\]")
     id_link_regex_no_group = re.compile(r"\[\[[0-9]{14}\]\]")

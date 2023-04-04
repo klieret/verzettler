@@ -71,7 +71,6 @@ def handle_action_on_path(action: str, path: Path) -> None:
 
 
 def cli():
-
     parser = argparse.ArgumentParser()
     cli_util.add_zk_dirs_arg(parser)
     cli_util.add_debug_args(parser)
